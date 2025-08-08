@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL、HTML、JS、服务器与浏览器工作流程</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --url-color: #3498db;
+            --html-color: #e74c3c;
+            --js-color: #f39c12;
+            --server-color: #2ecc71;
+            --browser-color: #9b59b6;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+        }
+        
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.4rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+        
+        .component-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .component-card {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 15px;
+            padding: 25px;
+            width: 220px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .component-card:hover {
+            transform: translateY(-10px) scale(1.05);
+        }
+        
+        .component-card i {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .component-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .url-card {
+            border-top: 6px solid var(--url-color);
+        }
+        .url-card i {
+            color: var(--url-color);
+        }
+        
+        .html-card {
+            border-top: 6px solid var(--html-color);
+        }
+        .html-card i {
+            color: var(--html-color);
+        }
+        
+        .js-card {
+            border-top: 6px solid var(--js-color);
+        }
+        .js-card i {
+            color: var(--js-color);
+        }
+        
+        .server-card {
+            border-top: 6px solid var(--server-color);
+        }
+        .server-card i {
+            color: var(--server-color);
+        }
+        
+        .browser-card {
+            border-top: 6px solid var(--browser-color);
+        }
+        .browser-card i {
+            color: var(--browser-color);
+        }
+        
+        .workflow-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            margin: 40px 0;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            color: var(--dark);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--url-color), var(--html-color), var(--js-color), var(--server-color), var(--browser-color));
+            margin: 15px auto;
+            border-radius: 2px;
+        }
+        
+        .workflow-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-height: 600px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 50px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        
+        .step-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .step-content {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .step-content h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .step:nth-child(1) .step-icon { background: var(--browser-color); }
+        .step:nth-child(2) .step-icon { background: var(--url-color); }
+        .step:nth-child(3) .step-icon { background: var(--server-color); }
+        .step:nth-child(4) .step-icon { background: var(--html-color); }
+        .step:nth-child(5) .step-icon { background: var(--js-color); }
+        
+        .connector {
+            position: absolute;
+            left: 50%;
+            top: 120px;
+            bottom: 0;
+            width: 8px;
+            background: linear-gradient(to bottom, var(--browser-color), var(--url-color), var(--server-color), var(--html-color), var(--js-color));
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        
+        .demo-section {
+            display: flex;
+            gap: 40px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .url-input-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .url-input-section h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--url-color);
+            text-align: center;
+        }
+        
+        .url-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .input-group input, .input-group select {
+            padding: 14px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--url-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .submit-btn {
+            background: var(--url-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .simulation-section {
+            flex: 1;
+            min-width: 300px;
+            background: var(--dark);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            color: white;
+        }
+        
+        .simulation-section h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--js-color);
+            text-align: center;
+        }
+        
+        .simulation-content {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 300px;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            overflow: auto;
+            max-height: 400px;
+        }
+        
+        .request-line {
+            color: #3498db;
+        }
+        
+        .response-headers {
+            color: #2ecc71;
+        }
+        
+        .html-code {
+            color: #e74c3c;
+        }
+        
+        .js-code {
+            color: #f39c12;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .step {
+                flex-direction: column !important;
+                text-align: center;
+                margin-bottom: 80px;
+            }
+            
+            .step-icon {
+                margin-bottom: 20px;
+            }
+            
+            .connector {
+                left: 60px;
+            }
+            
+            .demo-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Web技术全流程解析</h1>
+            <p>从URL输入到页面渲染 - 浏览器、服务器、HTML与JavaScript如何协同工作</p>
+        </header>
+        
+        <div class="component-cards">
+            <div class="component-card url-card">
+                <i class="fas fa-link"></i>
+                <h3>URL</h3>
+                <p>统一资源定位符，标识互联网上的资源地址</p>
+            </div>
+            
+            <div class="component-card browser-card">
+                <i class="fas fa-window-maximize"></i>
+                <h3>浏览器</h3>
+                <p>发送请求、解析内容并渲染页面的客户端</p>
+            </div>
+            
+            <div class="component-card server-card">
+                <i class="fas fa-server"></i>
+                <h3>服务器</h3>
+                <p>处理请求、返回资源的后端系统</p>
+            </div>
+            
+            <div class="component-card html-card">
+                <i class="fab fa-html5"></i>
+                <h3>HTML</h3>
+                <p>定义网页结构和内容的标记语言</p>
+            </div>
+            
+            <div class="component-card js-card">
+                <i class="fab fa-js-square"></i>
+                <h3>JavaScript</h3>
+                <p>实现网页交互和动态功能的脚本语言</p>
+            </div>
+        </div>
+        
+        <div class="workflow-section">
+            <h2 class="section-title">工作流程详解</h2>
+            
+            <div class="workflow-diagram">
+                <div class="connector"></div>
+                
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-window-maximize"></i>
+                    </div>
+                    <div class="step-content">
+                        <h3>1. 用户在浏览器输入URL</h3>
+                        <p>用户在浏览器地址栏输入网址（如https://example.com），浏览器开始处理请求。</p>
+                        <p>浏览器解析URL，提取协议（HTTP/HTTPS）、域名、端口（默认80/443）和资源路径。</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <div class="step-content">
+                        <h3>2. DNS解析与TCP连接</h3>
+                        <p>浏览器通过DNS将域名解析为IP地址（如93.184.216.34）。</p>
+                        <p>浏览器与服务器建立TCP连接（HTTP是80端口，HTTPS是443端口）。</p>
+                        <p>如果是HTTPS，还会进行TLS握手以建立安全连接。</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="step-content">
+                        <h3>3. 服务器处理请求</h3>
+                        <p>服务器接收HTTP请求（如GET /index.html HTTP/1.1）。</p>
+                        <p>服务器应用（如Apache、Nginx）处理请求：</p>
+                        <ul>
+                            <li>静态资源：直接返回文件内容</li>
+                            <li>动态内容：通过PHP、Node.js等生成HTML</li>
+                        </ul>
+                        <p>服务器构建HTTP响应（状态码、响应头、响应体）。</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fab fa-html5"></i>
+                    </div>
+                    <div class="step-content">
+                        <h3>4. 浏览器解析HTML</h3>
+                        <p>浏览器接收HTML响应后开始解析：</p>
+                        <ul>
+                            <li>构建DOM（文档对象模型）树</li>
+                            <li>解析CSS并构建CSSOM（CSS对象模型）</li>
+                            <li>将DOM和CSSOM合并为渲染树</li>
+                        </ul>
+                        <p>遇到&lt;link&gt;、&lt;script&gt;等标签时，会暂停解析并加载外部资源。</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fab fa-js-square"></i>
+                    </div>
+                    <div class="step-content">
+                        <h3>5. JavaScript执行与页面渲染</h3>
+                        <p>浏览器执行JavaScript代码：</p>
+                        <ul>
+                            <li>操作DOM和CSSOM</li>
+                            <li>处理用户交互</li>
+                            <li>发送AJAX请求获取额外数据</li>
+                        </ul>
+                        <p>根据渲染树计算布局（Layout）并绘制（Paint）到屏幕上。</p>
+                        <p>JavaScript可以动态修改页面内容和样式。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="workflow-section">
+            <h2 class="section-title">交互式演示</h2>
+            
+            <div class="demo-section">
+                <div class="url-input-section">
+                    <h3>模拟HTTP请求</h3>
+                    <form class="url-form" id="requestForm">
+                        <div class="input-group">
+                            <label for="url">URL地址：</label>
+                            <input type="text" id="url" value="https://www.example.com/index.html" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="method">HTTP方法：</label>
+                            <select id="method">
+                                <option value="GET" selected>GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="protocol">协议：</label>
+                            <select id="protocol">
+                                <option value="HTTP/1.1" selected>HTTP/1.1</option>
+                                <option value="HTTP/2">HTTP/2</option>
+                                <option value="HTTP/3">HTTP/3</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">发送请求</button>
+                    </form>
+                </div>
+                
+                <div class="simulation-section">
+                    <h3>请求与响应模拟</h3>
+                    <div class="simulation-content" id="simulationOutput">
+                        <!-- 模拟内容将通过JavaScript动态生成 -->
+                        请点击"发送请求"按钮查看请求响应过程
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>理解URL、HTML、JavaScript、服务器与浏览器的交互过程是Web开发的基础</p>
+            <p>© 2023 Web技术可视化教程 | 从概念到实现</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.getElementById('requestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const url = document.getElementById('url').value;
+            const method = document.getElementById('method').value;
+            const protocol = document.getElementById('protocol').value;
+            
+            // 解析URL
+            const urlObj = new URL(url);
+            const domain = urlObj.hostname;
+            const path = urlObj.pathname;
+            
+            // 生成模拟输出
+            let output = `<span class="request-line">${method} ${path} ${protocol}</span>\n`;
+            output += `Host: ${domain}\n`;
+            output += `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)\n`;
+            output += `Accept: text/html,application/xhtml+xml\n`;
+            output += `Accept-Language: zh-CN,zh;q=0.9\n`;
+            output += `Connection: keep-alive\n\n`;
+            
+            output += "<span class=\"response-headers\">HTTP/1.1 200 OK</span>\n";
+            output += "Content-Type: text/html; charset=utf-8\n";
+            output += "Content-Length: 1024\n";
+            output += "Connection: close\n";
+            output += "Server: Nginx/1.18.0\n";
+            output += "Date: " + new Date().toUTCString() + "\n\n";
+            
+            output += `<span class="html-code">&lt;!DOCTYPE html&gt;\n&lt;html&gt;\n&lt;head&gt;\n  &lt;title&gt;示例页面&lt;/title&gt;\n&lt;/head&gt;\n&lt;body&gt;\n  &lt;h1&gt;欢迎访问${domain}&lt;/h1&gt;\n  &lt;p&gt;这是通过${method}请求获取的页面&lt;/p&gt;\n\n`;
+            output += `  &lt;script&gt;\n    // JavaScript代码\n    document.addEventListener('DOMContentLoaded', function() {\n      console.log('页面加载完成！');\n      document.querySelector('h1').style.color = '${getRandomColor()}';\n    });\n  &lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;</span>`;
+            
+            document.getElementById('simulationOutput').innerHTML = output;
+        });
+        
+        function getRandomColor() {
+            const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+    </script>
+</body>
+</html>

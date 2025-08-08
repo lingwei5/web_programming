@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页开发三剑客：HTML, CSS & JavaScript</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --html-color: #e34c26;
+            --css-color: #264de4;
+            --js-color: #f0db4f;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            animation: fadeInDown 1s ease;
+        }
+        
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.4rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+        
+        .analogy {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .analogy-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .analogy-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .analogy-card.html {
+            border-top: 6px solid var(--html-color);
+        }
+        
+        .analogy-card.css {
+            border-top: 6px solid var(--css-color);
+        }
+        
+        .analogy-card.js {
+            border-top: 6px solid var(--js-color);
+        }
+        
+        .analogy-card i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .analogy-card.html i {
+            color: var(--html-color);
+        }
+        
+        .analogy-card.css i {
+            color: var(--css-color);
+        }
+        
+        .analogy-card.js i {
+            color: var(--js-color);
+        }
+        
+        .analogy-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .comparison-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            margin: 40px 0;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            color: var(--dark);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--html-color), var(--css-color), var(--js-color));
+            margin: 15px auto;
+            border-radius: 2px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        
+        .comparison-table th {
+            background-color: var(--dark);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .html-row td:first-child {
+            color: var(--html-color);
+            font-weight: bold;
+        }
+        
+        .css-row td:first-child {
+            color: var(--css-color);
+            font-weight: bold;
+        }
+        
+        .js-row td:first-child {
+            color: var(--js-color);
+            font-weight: bold;
+        }
+        
+        .demo-section {
+            display: flex;
+            gap: 40px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .code-editor {
+            flex: 1;
+            min-width: 300px;
+            background: #2c3e50;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .editor-header {
+            display: flex;
+            background: #1e2a3a;
+            padding: 12px 20px;
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .editor-title {
+            color: #ecf0f1;
+            font-weight: bold;
+            flex: 1;
+        }
+        
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .editor-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .btn-close { background: #e74c3c; }
+        .btn-min { background: #f39c12; }
+        .btn-max { background: #2ecc71; }
+        
+        .code-container {
+            padding: 20px;
+            font-family: 'Consolas', monospace;
+            color: #ecf0f1;
+            line-height: 1.5;
+            min-height: 300px;
+            overflow: auto;
+            font-size: 1.1rem;
+        }
+        
+        .html-code { color: #e34c26; }
+        .css-code { color: #264de4; }
+        .js-code { color: #f0db4f; }
+        
+        .preview {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .preview-header {
+            background: #3498db;
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        
+        .preview-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        #demoCard {
+            width: 300px;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        #demoCard h2 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        #demoCard p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .control-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .html-btn { background: var(--html-color); }
+        .css-btn { background: var(--css-color); }
+        .js-btn { background: var(--js-color); }
+        
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            margin-top: 50px;
+        }
+        
+        footer p {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .analogy {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .demo-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>HTML, CSS & JavaScript</h1>
+            <p>构建现代网页的三大核心技术</p>
+            
+            <div class="analogy">
+                <div class="analogy-card html">
+                    <i class="fab fa-html5"></i>
+                    <h3>HTML - 骨架</h3>
+                    <p>定义网页的结构和内容，如标题、段落、图像等</p>
+                </div>
+                
+                <div class="analogy-card css">
+                    <i class="fab fa-css3-alt"></i>
+                    <h3>CSS - 外观</h3>
+                    <p>控制网页的样式和布局，如颜色、字体、间距等</p>
+                </div>
+                
+                <div class="analogy-card js">
+                    <i class="fab fa-js-square"></i>
+                    <h3>JavaScript - 行为</h3>
+                    <p>实现网页的交互和动态功能，如表单验证、动画等</p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="comparison-section">
+            <h2 class="section-title">技术对比</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>特性</th>
+                        <th>HTML</th>
+                        <th>CSS</th>
+                        <th>JavaScript</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="html-row">
+                        <td>核心功能</td>
+                        <td>定义内容结构</td>
+                        <td>样式和布局</td>
+                        <td>交互和动态行为</td>
+                    </tr>
+                    <tr class="css-row">
+                        <td>文件扩展名</td>
+                        <td>.html</td>
+                        <td>.css</td>
+                        <td>.js</td>
+                    </tr>
+                    <tr class="js-row">
+                        <td>主要元素</td>
+                        <td>&lt;div&gt;, &lt;p&gt;, &lt;h1&gt;等</td>
+                        <td>选择器、属性、值</td>
+                        <td>变量、函数、事件</td>
+                    </tr>
+                    <tr class="html-row">
+                        <td>依赖关系</td>
+                        <td>独立运行</td>
+                        <td>依赖HTML</td>
+                        <td>依赖HTML</td>
+                    </tr>
+                    <tr class="css-row">
+                        <td>最新版本</td>
+                        <td>HTML5</td>
+                        <td>CSS3</td>
+                        <td>ECMAScript 2022</td>
+                    </tr>
+                    <tr class="js-row">
+                        <td>学习曲线</td>
+                        <td>容易</td>
+                        <td>中等</td>
+                        <td>较难</td>
+                    </tr>
+                    <tr class="html-row">
+                        <td>示例代码</td>
+                        <td>&lt;h1&gt;标题&lt;/h1&gt;</td>
+                        <td>h1 { color: blue; }</td>
+                        <td>document.querySelector('h1')</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="comparison-section">
+            <h2 class="section-title">互动演示</h2>
+            <p style="text-align: center; margin-bottom: 30px; font-size: 1.2rem;">在下方查看代码并体验三者的协同工作方式</p>
+            
+            <div class="demo-section">
+                <div class="code-editor">
+                    <div class="editor-header">
+                        <div class="editor-title">网页代码示例</div>
+                        <div class="editor-actions">
+                            <div class="editor-btn btn-close"></div>
+                            <div class="editor-btn btn-min"></div>
+                            <div class="editor-btn btn-max"></div>
+                        </div>
+                    </div>
+                    <div class="code-container">
+                        <div class="html-code">
+                            &lt;!-- HTML 代码 --&gt;<br>
+                            &lt;div id="card"&gt;<br>
+                            &nbsp;&nbsp;&lt;h2&gt;欢迎来到前端世界&lt;/h2&gt;<br>
+                            &nbsp;&nbsp;&lt;p&gt;这是一个演示HTML、CSS和JavaScript如何协同工作的示例。&lt;/p&gt;<br>
+                            &nbsp;&nbsp;&lt;button class="btn"&gt;点我!&lt;/button&gt;<br>
+                            &lt;/div&gt;
+                        </div>
+                        <br>
+                        <div class="css-code">
+                            /* CSS 代码 */<br>
+                            #card {<br>
+                            &nbsp;&nbsp;width: 300px;<br>
+                            &nbsp;&nbsp;padding: 20px;<br>
+                            &nbsp;&nbsp;border-radius: 10px;<br>
+                            &nbsp;&nbsp;background: white;<br>
+                            &nbsp;&nbsp;box-shadow: 0 5px 15px rgba(0,0,0,0.1);<br>
+                            &nbsp;&nbsp;transition: all 0.3s ease;<br>
+                            }<br>
+                            <br>
+                            .btn {<br>
+                            &nbsp;&nbsp;padding: 10px 20px;<br>
+                            &nbsp;&nbsp;background: #3498db;<br>
+                            &nbsp;&nbsp;color: white;<br>
+                            &nbsp;&nbsp;border: none;<br>
+                            &nbsp;&nbsp;border-radius: 5px;<br>
+                            &nbsp;&nbsp;cursor: pointer;<br>
+                            }
+                        </div>
+                        <br>
+                        <div class="js-code">
+                            // JavaScript 代码<br>
+                            const card = document.getElementById('card');<br>
+                            const btn = document.querySelector('.btn');<br>
+                            <br>
+                            btn.addEventListener('click', () => {<br>
+                            &nbsp;&nbsp;// 改变卡片样式<br>
+                            &nbsp;&nbsp;card.style.transform = 'scale(1.05)';<br>
+                            &nbsp;&nbsp;card.style.backgroundColor = '#f0f0f0';<br>
+                            &nbsp;&nbsp;<br>
+                            &nbsp;&nbsp;// 添加新元素<br>
+                            &nbsp;&nbsp;const message = document.createElement('p');<br>
+                            &nbsp;&nbsp;message.textContent = '你点击了按钮!';<br>
+                            &nbsp;&nbsp;card.appendChild(message);<br>
+                            });
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preview">
+                    <div class="preview-header">实时预览</div>
+                    <div class="preview-content">
+                        <div id="demoCard">
+                            <h2>欢迎来到前端世界</h2>
+                            <p>这是一个演示HTML、CSS和JavaScript如何协同工作的示例。</p>
+                            <button id="demoBtn" class="control-btn">点我!</button>
+                        </div>
+                        
+                        <div class="controls">
+                            <button class="control-btn html-btn" onclick="changeContent()">修改HTML内容</button>
+                            <button class="control-btn css-btn" onclick="changeStyle()">修改CSS样式</button>
+                            <button class="control-btn js-btn" onclick="addAnimation()">添加JS动画</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>HTML提供结构，CSS负责表现，JavaScript实现交互</p>
+            <p>三者共同构建了现代Web体验 | &copy; 2023 前端技术演示</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 获取DOM元素
+        const demoCard = document.getElementById('demoCard');
+        const demoBtn = document.getElementById('demoBtn');
+        
+        // 按钮点击事件
+        demoBtn.addEventListener('click', function() {
+            // 改变卡片样式
+            demoCard.style.transform = 'scale(1.05)';
+            demoCard.style.backgroundColor = '#f0f0f0';
+            
+            // 添加新元素
+            const message = document.createElement('p');
+            message.textContent = '你点击了按钮！JavaScript正在工作！';
+            message.style.color = '#e74c3c';
+            message.style.marginTop = '15px';
+            message.style.fontWeight = 'bold';
+            demoCard.appendChild(message);
+            
+            // 3秒后重置
+            setTimeout(() => {
+                demoCard.style.transform = '';
+                demoCard.style.backgroundColor = '';
+                if (demoCard.children.length > 3) {
+                    demoCard.removeChild(demoCard.lastChild);
+                }
+            }, 3000);
+        });
+        
+        // 控制按钮功能
+        function changeContent() {
+            const title = demoCard.querySelector('h2');
+            const content = demoCard.querySelector('p');
+            
+            title.textContent = 'HTML内容已修改!';
+            content.textContent = 'HTML负责定义网页的结构和内容，就像建筑物的骨架。';
+            content.style.color = '#e34c26';
+            
+            setTimeout(() => {
+                title.textContent = '欢迎来到前端世界';
+                content.textContent = '这是一个演示HTML、CSS和JavaScript如何协同工作的示例。';
+                content.style.color = '';
+            }, 3000);
+        }
+        
+        function changeStyle() {
+            demoCard.style.backgroundColor = '#3498db';
+            demoCard.style.color = 'white';
+            demoCard.style.boxShadow = '0 10px 25px rgba(52, 152, 219, 0.5)';
+            
+            setTimeout(() => {
+                demoCard.style.backgroundColor = '';
+                demoCard.style.color = '';
+                demoCard.style.boxShadow = '';
+            }, 3000);
+        }
+        
+        function addAnimation() {
+            demoCard.style.animation = 'shake 0.5s';
+            
+            // 添加关键帧动画
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes shake {
+                    0% { transform: translateX(0); }
+                    25% { transform: translateX(-10px); }
+                    50% { transform: translateX(10px); }
+                    75% { transform: translateX(-10px); }
+                    100% { transform: translateX(0); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            setTimeout(() => {
+                demoCard.style.animation = '';
+                document.head.removeChild(style);
+            }, 500);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web应用路径解析：根目录、相对目录与URL路径</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --accent: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #3a1c71);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .panel-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .panel-title i {
+            font-size: 1.8rem;
+            margin-right: 15px;
+            color: var(--primary);
+        }
+        
+        .panel-title h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+        }
+        
+        /* 文件浏览器样式 */
+        .file-browser {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .path-bar {
+            display: flex;
+            align-items: center;
+            background: var(--light);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        
+        .path-bar .root {
+            color: var(--accent);
+            font-weight: bold;
+        }
+        
+        .path-bar .current {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .file-tree {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 400px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .folder {
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .folder-header {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        
+        .folder-header:hover {
+            background: #e3f2fd;
+        }
+        
+        .folder-header i {
+            color: #f39c12;
+            margin-right: 8px;
+        }
+        
+        .folder-children {
+            padding-left: 25px;
+            margin-top: 5px;
+            border-left: 2px dashed #ddd;
+        }
+        
+        .file {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 5px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .file:hover {
+            background: #e8f5e9;
+        }
+        
+        .file i {
+            color: var(--primary);
+            margin-right: 8px;
+        }
+        
+        .file.active {
+            background: #e3f2fd;
+            font-weight: bold;
+        }
+        
+        /* 概念解释区域 */
+        .concepts {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .concept-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .concept-card.root {
+            border-left-color: var(--accent);
+        }
+        
+        .concept-card.relative {
+            border-left-color: var(--secondary);
+        }
+        
+        .concept-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .concept-card h3 i {
+            margin-right: 10px;
+        }
+        
+        .concept-card ul {
+            padding-left: 25px;
+            margin-top: 15px;
+        }
+        
+        .concept-card li {
+            margin-bottom: 8px;
+        }
+        
+        .concept-card code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        /* URL模拟区域 */
+        .url-simulator {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .url-display {
+            display: flex;
+            margin-bottom: 25px;
+            background: var(--dark);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 1.2rem;
+            overflow-x: auto;
+        }
+        
+        .url-parts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .url-part {
+            padding: 12px 20px;
+            background: var(--light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .url-part:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .url-part.protocol {
+            background: #e3f2fd;
+            color: var(--primary);
+        }
+        
+        .url-part.domain {
+            background: #e8f5e9;
+            color: var(--secondary);
+        }
+        
+        .url-part.path {
+            background: #ffebee;
+            color: var(--accent);
+        }
+        
+        .url-part.file {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .explanation {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            margin-top: 25px;
+        }
+        
+        .explanation h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        footer p {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-folder-tree"></i> Web应用路径解析</h1>
+            <p>理解根目录、相对目录、浏览器和URL路径之间的关系</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-folder-open"></i>
+                    <h2>Web应用文件结构</h2>
+                </div>
+                
+                <div class="file-browser">
+                    <div class="path-bar">
+                        <span class="root">/</span>
+                        <span>home</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>projects</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="current">website</span>
+                    </div>
+                    
+                    <div class="file-tree">
+                        <div class="folder">
+                            <div class="folder-header">
+                                <i class="fas fa-folder"></i>
+                                <span>public</span>
+                            </div>
+                            <div class="folder-children">
+                                <div class="file">
+                                    <i class="fas fa-file"></i>
+                                    <span>index.html</span>
+                                </div>
+                                <div class="file">
+                                    <i class="fas fa-file"></i>
+                                    <span>about.html</span>
+                                </div>
+                                <div class="folder">
+                                    <div class="folder-header">
+                                        <i class="fas fa-folder"></i>
+                                        <span>images</span>
+                                    </div>
+                                    <div class="folder-children">
+                                        <div class="file">
+                                            <i class="fas fa-file-image"></i>
+                                            <span>logo.png</span>
+                                        </div>
+                                        <div class="file">
+                                            <i class="fas fa-file-image"></i>
+                                            <span>banner.jpg</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="folder">
+                            <div class="folder-header">
+                                <i class="fas fa-folder"></i>
+                                <span>css</span>
+                            </div>
+                            <div class="folder-children">
+                                <div class="file">
+                                    <i class="fas fa-file-code"></i>
+                                    <span>styles.css</span>
+                                </div>
+                                <div class="file">
+                                    <i class="fas fa-file-code"></i>
+                                    <span>theme.css</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="folder">
+                            <div class="folder-header">
+                                <i class="fas fa-folder"></i>
+                                <span>js</span>
+                            </div>
+                            <div class="folder-children">
+                                <div class="file">
+                                    <i class="fas fa-file-code"></i>
+                                    <span>app.js</span>
+                                </div>
+                                <div class="file">
+                                    <i class="fas fa-file-code"></i>
+                                    <span>utils.js</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="file active">
+                            <i class="fas fa-file-code"></i>
+                            <span>README.md</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="concepts">
+                <div class="concept-card root">
+                    <h3><i class="fas fa-home"></i> 根目录</h3>
+                    <p>根目录是文件系统的起点，通常用 <code>/</code> 表示。在Web应用中，它是服务器上网站内容的最顶层目录。</p>
+                    <ul>
+                        <li>绝对路径总是从根目录开始</li>
+                        <li>Web服务器的根目录通常映射到域名</li>
+                        <li>示例：<code>/var/www/html/</code> 或 Windows 上的 <code>C:\xampp\htdocs\</code></li>
+                    </ul>
+                </div>
+                
+                <div class="concept-card relative">
+                    <h3><i class="fas fa-directions"></i> 相对目录</h3>
+                    <p>相对目录是相对于当前工作目录的路径。在Web开发中，常用于引用资源文件。</p>
+                    <ul>
+                        <li><code>styles.css</code> - 当前目录下的文件</li>
+                        <li><code>../images/logo.png</code> - 上一级目录中的文件</li>
+                        <li><code>./js/app.js</code> - 当前目录下的文件（显式表示）</li>
+                    </ul>
+                </div>
+                
+                <div class="concept-card">
+                    <h3><i class="fas fa-globe"></i> URL路径</h3>
+                    <p>URL路径表示Web资源在服务器上的位置，由浏览器解析并发送到服务器。</p>
+                    <ul>
+                        <li><code>https://example.com/blog/article.html</code></li>
+                        <li>协议: <code>https</code></li>
+                        <li>域名: <code>example.com</code></li>
+                        <li>路径: <code>/blog/article.html</code></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="url-simulator">
+                <div class="panel-title">
+                    <i class="fas fa-link"></i>
+                    <h2>URL路径解析</h2>
+                </div>
+                
+                <div class="url-display">
+                    https://www.example.com<span class="root">/</span>projects/website/public/index.html
+                </div>
+                
+                <div class="url-parts">
+                    <div class="url-part protocol">https://</div>
+                    <div class="url-part domain">www.example.com</div>
+                    <div class="url-part path">/projects/website/public</div>
+                    <div class="url-part file">index.html</div>
+                </div>
+                
+                <div class="explanation">
+                    <h3>路径解析过程</h3>
+                    <p>当浏览器请求一个URL时：</p>
+                    <ol>
+                        <li>解析协议（HTTP/HTTPS）确定连接方式</li>
+                        <li>通过DNS查找域名对应的服务器IP地址</li>
+                        <li>将路径部分发送到Web服务器（如：<code>/projects/website/public/index.html</code>）</li>
+                        <li>Web服务器在根目录（如 <code>/var/www</code>）下查找请求的路径</li>
+                        <li>服务器返回找到的资源或生成动态内容</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>根目录是起点，相对路径基于当前位置，URL路径是浏览器与服务器的通信方式</p>
+            <p>理解这些概念对Web开发和服务器配置至关重要 | &copy; 2023 Web路径解析教程</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 文件树交互功能
+        const folderHeaders = document.querySelectorAll('.folder-header');
+        folderHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const folder = this.parentElement;
+                folder.classList.toggle('open');
+            });
+        });
+        
+        // 文件点击功能
+        const files = document.querySelectorAll('.file');
+        files.forEach(file => {
+            file.addEventListener('click', function() {
+                files.forEach(f => f.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // URL部分高亮效果
+        const urlParts = document.querySelectorAll('.url-part');
+        urlParts.forEach(part => {
+            part.addEventListener('mouseenter', function() {
+                const type = this.classList[1];
+                document.querySelectorAll('.url-part').forEach(p => {
+                    if (!p.classList.contains(type)) {
+                        p.style.opacity = "0.6";
+                    }
+                });
+            });
+            
+            part.addEventListener('mouseleave', function() {
+                document.querySelectorAll('.url-part').forEach(p => {
+                    p.style.opacity = "1";
+                });
+            });
+        });
+    </script>
+</body>
+</html>
