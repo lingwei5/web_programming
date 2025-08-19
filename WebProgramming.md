@@ -55,6 +55,9 @@ type="importmap"
 5. 自调用函数:函数表达式可以自调用,即自动调用，(function(){})()函数表达式后面紧跟()就会自动调用,声明的函数无法自调用,实际是匿名自我调用函数
 6. js函数是一个对象,有属性和方法,如arguments.length,arguments.callee,arguments.callee.caller
 7. 箭头函数表达式:ES6支持箭头函数表达式，语法为：var x = (parameters) => {statements}; 如果只有一个参数，可以省略括号，如果只有一条语句，可以省略花括号和return关键字，如：var x = (a, b) => a * b;
+8. getter函数 使用get关键字定义的属性，当做属性用，实际上是一个函数，如：var person = {firstName:"John", lastName:"Doe", get fullName() {return this.firstName + " " + this.lastName;}}
+
+
 
 ## 对象：
 对象是变量的容器，是键值对的容器，对象是属性的无序集合，属性是键值对，键是字符串，值可以是任意类型，如：var person = {firstName:"John", lastName:"Doe", age:50, eyeColor:"blue"};
@@ -83,6 +86,30 @@ $变量:
 1. jQuery中是jQuery的别名，存储jQuery对象，可以通过$访问jQuery对象的方法和属性，如：$(document).ready(function(){});
 2. 在Node.js中是全局变量，存储当前模块的上下文对象，可以访问当前模块的属性和方法，如：console.log(module.filename);
 3. 在现代前端框架中，如React、Vue等，$变量通常用于存储框架的实例，可以通过$访问框架的方法和属性，如：ReactDOM.render(<App />, document.getElementById('root'));
+
+## this
+this 的多种指向:实际都是调用的最近的object对象
+ 1、在对象方法中， this 指向调用它所在方法的对象。
+ 2、单独使用 this，它指向全局(Global)对象,浏览器中是window, Node.js中是global。
+ 3、函数使用中，this 指向函数的所属者。
+ 4、严格模式下函数是没有绑定到 this 上，这时候 this 是 undefined。
+ 5、在 HTML 事件句柄中，this 指向了接收事件的 HTML 元素。
+ 6、apply 和 call 允许切换函数执行的上下文环境（context），即 this 绑定的对象，可以将 this 引用到任何对象。
+ 7、箭头函数没有自己的 this，它会捕获其定义时所在上下文的 this 值，作为自己的 this 值。在对象方法的定义里，仍然指向window
+
+ console.log(obj)可以在浏览器的console中查看obj的数据类型和内容
+ typeof obj可以查看obj的数据类型
+
+## 简写
+1. (()=>{console.log("hello")})() 自调用闭包函数
+2. const obj={x:1,y:2}; const {x,y}=obj; 解构赋值
+3. 模板字符串'${variable}'，可以嵌入变量或表达式，如：`Hello, ${name}!`，`The sum of ${a} and ${b} is ${a + b}.`
+4. import @/router-->从@路径下的router文件夹导入router.js router.vue或者index.js index.vue
+
+js文件的作用域
+1. 浏览器环境中，全局作用域是window对象，全局变量是window对象的属性，全局函数是window对象的方法，全局变量和函数在全局作用域中都可以访问，全局变量和函数在全局作用域中都可以修改，全局变量和函数在全局作用域中都可以删除。多个script标签引入的多个js文件的全局变量和函数都会挂载到window对象
+2. Node.js环境中，每个文件都被视为独立模块，有自己的作用域，模块内声明的var只能在本模块内使用，不会挂载到Node.js的全局对象global上，需要显示import/export
+
 
 # CSS
 ![alt text](Box模型.png)
@@ -117,6 +144,19 @@ https://www.runoob.com/cssref/css-selectors.html
 # Three.js
 # WebGL
 
+# AJAX
+AJAX = Asynchronous JavaScript and XML
+AJAX 最大的优点是在不重新加载整个页面的情况下，可以与服务器交换数据并更新部分网页内容
+通过在后台与服务器进行少量数据交换，AJAX 可以使网页实现异步更新。这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。
+
+传统的网页（不使用 AJAX）如果需要更新内容，必需重载整个网页面。
+
+XMLHttpRequest 是实现 Ajax 的一种方式，当然也可以使用 fetch API(基于promise) 等现代方法。
+google的ajax库：jQuery
+Google搜索的suggest使ajax流行起来的，当在搜索框中输入字符时，它会发送一个请求到服务器，然后服务器返回匹配的搜索结果，然后客户端使用JavaScript动态更新搜索框中的内容，而不需要重新加载整个页面。
+
+jQuery:一个快速、简洁的JavaScript库，简化了HTML文档遍历、事件处理、动画和Ajax交互
+
 # Java
 package com.example.demo;//包声明，就是个命名空间，防止命名冲突，包名一般用小写字母，一般约定就是xxx.java的文件路径
 import 的原理是编译时解析，导出引用或者地址
@@ -140,6 +180,7 @@ interface - 定义接口
 
 
 ## spring注解
+![alt text](Spring注解思维导图.png)
 核心注解：
 	@Component: 标记一个类为Spring容器管理的组件（Bean）。它是所有Spring管理的组件的通用注解。
 	@Service: 用于标记服务层的组件，是@Component的特例。
@@ -207,18 +248,37 @@ Spring Boot特有注解：
 	@Scope: 指定Bean的作用域（如：prototype, request, session等）。
 	@Primary: 当有多个同类型Bean时，标记为首选Bean。
 
+![alt text](Spring框架全家桶架构.png)
+![alt text](SpringMVC原理架构.png)
 
-web技术演进
-
+## servlet
+web技术演进:
 静态网页1991-1995 无js--> 动态网页php95 js95 servelet/jsp97--->web2.0 ajax 2005 jQuery AngularJS--->web3.0 2010 react vue angular--->web4.0 2018 WebAssembly webGPU WebXR
+![alt text](web技术演进图.png)
 
 ![alt text](php-asp-servlet-jsp.png)
-![alt text](asp-asp.net.svg)
-![alt text](php到现代框架.svg)
-![alt text](<jsp到spring boot.svg>)
 
 ![alt text](asp-asp.net.svg)
 ![alt text](php到现代框架.svg)
 ![alt text](<jsp到spring boot.svg>)
 
 ![alt text](技术演进规律.png)
+
+jpa:java persistence api
+jpa是java提供的一套持久化规范，它提供了一套标准的API来操作数据库，使得开发者可以不直接操作数据库，而是通过操作Java对象来操作数据库。jpa的实现有很多种，比如Hibernate、EclipseLink等。
+
+Hibernate:是一个开源的对象关系映射（ORM）框架，它实现了JPA规范，使得开发者可以方便地使用JPA来操作数据库。Hibernate提供了丰富的功能，包括对象关系映射、缓存、事务管理等。
+
+Servlet:是一个Java EE规范，它定义了如何处理HTTP请求和响应。Servlet是一个Java类，它实现了Servlet接口，可以处理HTTP请求和响应。Servlet可以用于构建Web应用程序，它可以在服务器端执行Java代码，并生成动态的Web内容。
+HttpServlet:是Servlet的一个子类，它提供了处理HTTP请求和响应的方法。HttpServlet可以处理GET、POST、PUT、DELETE等HTTP请求方法，并生成HTML、JSON、XML等格式的响应内容。
+生命周期:Servlet的生命周期包括初始化、服务、销毁三个阶段。在初始化阶段，Servlet容器会调用Servlet的init()方法来初始化Servlet。在服务阶段，Servlet容器会调用Servlet的service()方法来处理~~HTTP~~请求和响应。在销毁阶段，Servlet容器会调用Servlet的destroy()方法来销毁Servlet。
+HttpServlet extends GenericServlet implements Servlet,ServletConfig
+{
+	protected void service(HttpServletRequest httpServletRequest,
+                       HttpServletResponse httpServletResponse){
+        //该方法通过httpServletRequest.getMethod()判断请求类型调用doGet() doPost()
+   }
+}
+
+HttpServletRequest implent ServletRequest 
+HttpServletResponse implent ServletResponse 
