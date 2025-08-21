@@ -32,8 +32,155 @@ url:统一资源定位符 带.html会直接访问html文件，不带.html会识�
 静态资源
 动态资源:js node.js等生成
 html转义字符 &，可以用来在网页展示html tag标签
+&#128515; emoji表情
 
 各种tag标签的用途 及属性
+
+## 全局属性
+id style class lang title
+accesskey:设置快捷键,如：accesskey="h" 可以通过alt+h快速聚焦到该标签，a标签就会跳转或下载
+draggable dropzone
+hidden tabindex
+contenteditable:是否可以直接在浏览器里编辑标签内容
+contextmenu:右键标签时的上下文菜单,主流都不支持   
+spellcheck  translate
+dir:ltr rtl auto
+data-*:domElement.getAttribute("data-animal-type")
+![alt text](全局属性.png)
+
+## 事件属性
+![alt text](窗口事件.png)
+![alt text](键盘事件.png)
+![alt text](鼠标事件.png)
+![alt text](表单事件.png)
+![alt text](多媒体事件.png)
+
+## 基础
+html:代表当前doc
+head:网页的头部，包含网页的元信息，如标题、样式表、脚本等
+title:网页的标题，显示在浏览器的标题栏
+body:网页的主体，包含网页的内容，如文本、图片、链接、表格等
+meta:网页的元信息，如描述、关键词、作者等
+h1 到h6:网页的标题，h1是最大的标题，h6是最小的标题
+p:网页的段落
+br:网页的换行
+hr:网页的水平线 标签定义 HTML 页面中的主题变化（比如话题的转移），并显示为一条水平线
+!--...--:网页的注释
+
+## 格式
+1. acronym abbr:缩写,鼠标放到标签内的文本上时，会显示title属性的内容 <abbr title="World Health Organization">WHO</abbr>
+2. address 标签定义文档作者/所有者的联系信息。
+	如果 address 元素位于 body 元素内部，则它表示该文档作者/所有者的联系信息。
+	如果 address 元素位于 article 元素内部，则它表示该文章作者/所有者的联系信息。
+	address 元素的文本通常呈现为斜体。大多数浏览器会在该元素的前后添加换行。
+3. b:粗体文本
+4. bdi:bdi 指的是 bidi 隔离（Bi-directional Isolation）。
+	标签允许您设置一段文本，使其脱离其父元素的文本方向设置。
+	在发布用户评论或其他您无法完全控制的内容时，该标签很有用。
+	bdo:标签覆盖默认的文本方向。Bi-Directional Override
+5. blockquote:定义摘自另一个源的块引用
+6. cite:标签定义作品（比如书籍、歌曲、电影、电视节目、绘画、雕塑等等）的标题
+7. code:短语标签，它表示计算机代码片段，不建议使用，还包括em strong dfn samp kbd var cite code
+8. del:标签定义文档中已被删除的文本。中划线 <del>删除</del>
+9. i:斜体文本
+10. ins:标签定义文档中插入的文本。下划线 <ins>插入</ins>
+11. mark:标签定义带有记号的文本。背景色高亮 <mark>高亮</mark>
+12. meter:标签定义度量衡（单位）。仅用于已知最大和最小值的度量。百分比占比条形图.value min max low high optimum
+13. pre:标签定义预格式化的文本。保留文本的空格和换行符，文本会以等宽字体显示，如：`<pre>hello world</pre>`
+14. progress:表示进行中的任务进度，可以用来显示任务的进度条。value max
+15. q:定义短的引用。引用的文本会自动添加引号，如：`<q>hello world</q>`
+16. s:定义加删除线的文本。表示不再准确或过时但未被删除的文本，如电子商务中的原价显示，一般独立使用.del表示内容被删除、替换，通常与ins一起使用，用于文档修订和版本控制
+17. sub/sup:定义下标或上标文本。sub:下标 sup:上标
+18. time:标签定义一个日期/时间。datetime属性指定日期/时间，如：`<time datetime="2021-01-01">2021年1月1日</time>`,以机器可读的方式对日期时间进行编码,能够把生日提醒或排定的事件添加到用户日程表中，搜索引擎也能够生成更智能的搜索结果
+19. wbr:work break
+## 表单
+留学申请表 信息确认表等，是一个数据，含有非常多的不同信息，如电话 邮箱 年龄 职业 学历等;而table则是多个数据，所有的数据都有相同的字段;一个表单数据可以是表格数据里的一行数据
+1. form:定义一个表单，用于提交数据到服务器,可以包含以下一个或多个表单元素
+2. input:定义一个输入字段，用于接收用户输入,元素是空的,它只包含标签属性,可以没有结束标签,可以使用label元素定义标注
+   1. 支持各种输入**type**,如button checkbox color date datetime datetime-local email file hidden image month number password radio range reset search submit tel text time url week
+   2. 还有各种属性，如**alt** accept autocomplete autofocus checked disabled **form** formaction formenctype formmethod formnovalidate formtarget height max maxlength min multiple name pattern placeholder **readonly** required **size**字符数 step type **value** width list引用datalist元素
+3. textarea:定义一个多行文本输入控件
+4. button:定义一个按钮，用于提交表单或执行其他操作,与input的type="button"类似，但可以包含其他元素，如文本、图片等
+5. select:定义一个下拉列表，用于选择一个选项
+6. option:定义下拉列表中的一个选项
+7. optgroup:定义一个选项组，用于将多个选项分组
+8. label:定义一个标签，用于描述输入字段
+9. fieldset:定义一个字段集，用于将表单中的相关元素分组![alt text](字段集合效果.png)![alt text](字段集合实现.png)
+10. legend:定义一个图例，用于描述字段集
+11. datalist:定义一个数据列表，用于提供输入字段的预定义选项
+12. keygen:定义一个密钥对生成器字段
+13. output:定义一个计算结果，用于显示表单的输出结果
+
+## 框架
+1. frame:定义一个框架,布局整个页面
+2. frameset:定义一个框架集，用于包含多个框架
+3. iframe:定义一个内联框架，用于嵌入另一个文档作为部分内容
+## 图像
+1. img:定义一个图像，用于显示图片,技术上图像并没有插入HTML页面,而是链接到HTML页面上,src属性指定图片的路径，alt属性指定图片的替代文本，width和height属性指定图片的宽度和高度 usemap属性指定图片的映射
+2. map:定义一个客户端图像映射，用于定义带有可点击区域的图像 name属性指定映射的名称 id
+3. area:定义一个图像映射中的可点击区域 永远嵌套在map标签内 shape属性指定区域的形状，可以是rect、circle、poly，coords属性指定区域的坐标，href属性指定区域的链接，alt属性指定区域的替代文本, rel属性指定链接的关系
+4. canvas:定义一个画布，用于绘制图形 width和height属性指定画布的宽度和高度
+5. figcaption:定义一个图像的标题 为figure标签定义标题
+6. figure:定义一个图像及其标题的组合
+## 音频/视频
+1. audio:定义一个音频播放器，用于播放音频文件 src属性指定音频文件的路径，controls属性指定是否显示播放控件 loop属性指定是否循环播放 autoplay属性指定是否自动播放 muted属性指定是否静音
+2. video:定义一个视频播放器，用于播放视频文件 src属性指定视频文件的路径，controls属性指定是否显示播放控件 loop属性指定是否循环播放 autoplay属性指定是否自动播放 muted属性指定是否静音
+3. source:定义一个媒体文件，用于指定视频或音频的源文件 type属性指定媒体文件的类型,不同浏览器支持不同格式的媒体文件，通过提供多个源，浏览器会自动选择第一个可用的源 开发者可以确保媒体内容能够在各种浏览器和设备上正常播放
+4. track:定义一个媒体文件的字幕，用于指定视频或音频的字幕文件 src指定字幕URL srclang属性指定字幕的语言，label属性指定字幕的标签
+## 链接
+1. a:定义一个超链接或者锚，href属性指定链接的目标地址，target属性指定链接的打开方式，如_blank在新窗口打开，_self在当前窗口打开，_parent在父窗口打开，_top在顶级窗口打开 download属性指定链接的下载文件名 rel属性指定当前文档与目标链接的关系，如noopener noreferrer
+2. link:定义一个链接，用于链接到外部资源，如样式表、图标等 rel属性指定链接的关系relationshape，如stylesheet、icon、preload href属性指定链接的目标地址 常用于链接样式表 空元素仅包含属性
+3. main:定义文档的主要内容，用于突出显示文档的主要部分，如文章、图片等
+4. nav:定义一个导航链接的部分，用于链接到其他页面，如菜单、目录等
+
+## 列表
+1. ul:无序列表
+2. ol:有序列表 带序号 start属性指定列表的起始序号 reversed属性指定列表的序号是否倒序
+3. li:列表项
+4. dl:定义一个描述列表 列表的容器元素 展示术语及其定义的语义化元素 description list
+5. dt:定义描述列表中的术语或短语 description terminology
+6. dd:定义描述列表中术语的定义或解释 description details
+7. menu:定义一个菜单列表 主流浏览器都不支持
+8. dir:定义一个目录列表，已废弃
+9. command:定义一个命令按钮 也不支持
+
+## 表格
+1. table:定义一个表格
+2. caption:定义表格的标题 直接放置在table元素后边
+3. th:定义表格中的表头单元格
+4. tr:定义表格中的一行
+5. td:定义表格中的一个单元格
+6. thead:表格的表头部分 可用于修改表格的样式 或者长表格打印时，每一页都有表头
+7. tbody:定义表格的主体部分
+8. tfoot:定义表格的页脚部分
+9. col:定义表格中的一列 span属性指定横跨的列数 可以向整个列应用样式
+10. colgroup:定义表格中的一组列
+
+## 样式/节
+![alt text](容器及语义化标签布局示意.png)
+1. style:定义文档的样式，用于定义CSS样式表
+2. div:定义一个块级容器元素，用于将内容分组，可以包含其他元素，如文本、图片等 division, HTML5引入了很多语义化标签header main footer nav代替div
+3. span:定义一个行内容器元素，用于对文档中的行内元素进行组合,跨度 跨距
+4. header:定义文档或者文档一部分区域的一个页眉，用于包含标题、导航链接等
+5. footer:定义文档或者文档一部分区域的一个页脚，用于包含版权信息、链接等
+6. section:定义一个节、文档中的独立部分，用于将内容分组，如文章、章节等
+7. article:定义一个文章，用于表示独立内容、自包含内容，如博客文章、新闻文章等
+8. aside:定义一个侧边栏，用于包含与主要内容相关的信息，如广告、侧边栏等
+9. details:定义一个详细内容，用于展开或折叠内容，如FAQ、详细信息等
+10. dialog:定义一个对话框，用于显示对话框内容，如弹出窗口、对话框等
+11. summary:定义一个详细内容的摘要，用于显示详细内容的标题，如FAQ、详细信息等
+
+## 元信息
+1. head:定义文档的头部，用于包含文档的元数据，如标题、样式表、脚本等
+2. meta:定义文档的元数据，用于指定文档的字符集、作者、描述、关键词等, name指定元数据名称，content指定元数据内容
+3. base:定义文档的基础URL，用于指定文档中所有链接的基础URL
+
+## 程序
+1. script:定义一个脚本，用于执行JavaScript代码，src属性指定脚本的URL，type属性指定脚本的类型，如text/javascript，async属性指定脚本是否异步执行，defer属性指定脚本是否延迟执行
+2. noscript:定义一个替代脚本，用于在不支持脚本的浏览器中显示内容
+3. embed:定义一个嵌入的内容，用于嵌入其他内容，如视频、音频、插件等,建议使用img iframe video audio等标签代替
+4. object:定义一个嵌入的对象,本意取代img applet,但主流浏览器都不支持
+
 
 script 定义脚本 src:引入外部js文件 
 type:定义脚本类型
