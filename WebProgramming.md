@@ -429,3 +429,160 @@ HttpServlet extends GenericServlet implements Servlet,ServletConfig
 
 HttpServletRequest implent ServletRequest 
 HttpServletResponse implent ServletResponse 
+
+
+# 服务器 容器
+web服务器 应用服务器 servlet容器 
+
+一、核心概念与比喻
+Web 服务器 (Nginx, Apache)：处理HTTP请求，提供静态资源，转发动态请求并返回响应
+
+特点：速度快、擅长处理简单重复的任务（静态文件服务、负载均衡）。
+
+Servlet 容器 (Tomcat, Jetty)：管理Servlet的生命周期、线程池 创建ServletRequest、ServletResponse等对象
+
+特点：它专门为“Java Servlet”服务，是应用服务器的核心组成部分。
+
+应用服务器 (Tomcat EE, JBoss/WildFly, WebLogic)：不仅包含Servlet容器的所有功能，还支持完整的Java EE/Jakarta EE规范
+
+特点：功能全面、重量级，为企业级应用（如复杂的金融、电商系统）提供全方位支持。
+
+
+二、分点详细解释
+1. Web 服务器 (Web Server)
+是什么：主要处理 HTTP(S) 协议的软件。
+
+核心功能：
+
+托管静态内容：直接提供硬盘上已有的文件（.html, .css, .js, .jpg等）。
+
+处理静态请求：速度快，效率高，因为不需要额外计算。
+
+反向代理与负载均衡：将接收到的请求转发给后端的多个应用服务器，分散压力。
+
+SSL/TLS 终止：处理 HTTPS 加密解密工作，减轻后端服务器压力。
+
+代表产品：Nginx、Apache HTTP Server、Microsoft IIS（也具备应用服务器功能）。
+
+2. Servlet 容器 (Servlet Container)
+是什么：它是 Java Servlet 技术的运行环境。Servlet 是用 Java 编写服务器端程序的一套标准 API。
+
+核心功能：
+
+生命周期管理：负责加载、初始化、执行和销毁 Servlet。
+
+通信支持：为 Servlet 提供了与 Web 服务器通信的接口，它解析来自 Web 服务器的请求，并将其转换为 Servlet 能理解的 HttpServletRequest 对象。同时，将 Servlet 返回的 HttpServletResponse 对象转换为 HTTP 响应发回 Web 服务器。
+
+线程管理：为每个请求分配一个线程，处理多并发请求。
+
+JSP 支持：将 JSP 页面编译并执行为 Servlet。
+
+代表产品：Apache Tomcat、Eclipse Jetty。
+
+3. 应用服务器 (Application Server)
+是什么：它是一个功能更强大的运行时环境，用于运行业务逻辑（应用程序）。
+
+核心功能：
+
+包含 Servlet 容器的所有功能：一个应用服务器必然内嵌了一个 Servlet 容器。
+
+支持完整的 Java EE/Jakarta EE 规范：提供除 Servlet/JSP 之外更多的企业级功能，如：
+
+EJB 容器：用于部署和管理分布式业务组件（Enterprise JavaBeans）。
+
+JMS：消息服务，支持异步通信。
+
+JTA：管理分布式事务。
+
+JPA：Java 持久化 API，更方便地操作数据库。
+
+代表产品：WildFly (原名 JBoss)、IBM WebSphere、Oracle WebLogic。
+
+三、关系与演进
+包含关系：应用服务器 ⊃ Servlet 容器
+
+Tomcat 是一个 Servlet 容器（尽管我们常称它为轻量级应用服务器）。
+
+WildFly, WebLogic 是应用服务器，它们内部也包含了一个像 Tomcat 一样的 Servlet 容器来实现 Web 功能。
+
+历史演进：
+
+早期：Web 服务器（Apache）负责静态资源，遇到动态请求（如.jsp）通过 CGI 或 mod_jk 等模块转发给后端的 Servlet 容器（Tomcat） 处理。这是一种物理分离的部署方式。
+
+现在：Tomcat 自身也具备了较强的静态资源处理能力。对于不涉及 EJB 等高级特性的普通 Java Web 应用（如 Spring Boot 应用），直接使用 Tomcat 作为唯一的服务器是最常见的选择。Spring Boot 甚至直接内置了 Tomcat，让你无需额外安装。
+
+对于需要消息队列、分布式事务等复杂企业级功能的场景，才会选择完整的应用服务器（如 WildFly）。
+
+
+现代开发中的常见模式：
+Nginx (Web Server) + Tomcat (Servlet Container/Application Server)：
+
+Nginx 放在最前面，处理所有静态请求（图片、CSS、JS），进行负载均衡和 SSL 加密。
+
+对于动态请求（如 /api/xxx），Nginx 反向代理给后端的一个或多个 Tomcat 实例处理。
+
+Tomcat 运行着你的 Java 应用程序（如 Spring MVC, Spring Boot），处理业务逻辑，访问数据库，生成动态内容。
+
+web服务器：
+1. Nginx:高性能 高并发 反向代理 负载均衡
+2. Apache HTTP Server(老祖宗):传统的 LAMP（Linux + Apache + MySQL + PHP）栈
+3. Microsoft IIS: Windows 下的 Web 服务器
+4. Apache Tomcat:Java 生态中的 Servlet 容器，常用于 Spring Boot 应用 严格来说，Tomcat 是一个 Servlet 容器/JSP 容器，但它也具备 Web 服务器\轻量级应用服务器的功能
+
+应用服务器:应用服务器 = Servlet 容器 + 其他企业级服务（EJB, JMS, JTA...）
+1. JBoss/WildFly:基于 Java EE 的应用服务器，支持 EJB、JMS、JTA 等企业级功能
+2. IBM WebSphere:功能全面、重量级，支持完整的 Java EE 规范
+3. Oracle WebLogic:Oracle 的 Java EE 应用服务器，支持完整的 Java EE 规范
+
+Servlet 容器:
+1. Apache Tomcat:最常用的 Servlet 容器，支持 JSP、Servlet、JNDI 等功能
+2. Eclipse Jetty:轻量级 Servlet 容器，适合嵌入式应用
+
+
+# 前端打包
+
+> 还在为满屏的`<script>`标签和混乱的依赖关系抓狂吗？🤯 让Webpack来拯救你的前端项目吧！它不是魔术，但效果堪比魔术！✨
+
+## 一、 当项目变胖了：我们为啥需要打包？
+
+记得早些年写网页吗？一个`index.html`里塞十几个`<script src="...">`标签（噩梦啊！！！），手动管理加载顺序（这个库依赖那个库，先加载谁？🤔），文件体积大加载慢（用户跑了...😭）。稍微大点的项目？直接原地爆炸！💥
+
+现代前端呢？模块化！ES Modules (`import/export`)，CSS预处理器（Sass/Less），新语法（TypeScript, JSX），图片/SVG/Fonts... **文件多、类型杂、依赖深！** 浏览器原生对这些"高级货"支持有限（或者压根不支持！🚫）。直接扔给浏览器？它只会一脸懵！🙄
+
+**痛点总结：**
+*   **依赖管理地狱：** 手动理清`A.js`依赖`B.css`依赖`C.png`？杀了我吧！😫
+*   **资源加载龟速：** 几十上百个文件，浏览器疯狂发请求，加载慢如蜗牛！🐌
+*   **新旧语法鸿沟：** 想用酷炫的ES6+/TS/JSX？老浏览器直接给你摆个臭脸！😠
+*   **资源类型壁垒：** CSS、图片、字体... JS 表示："我们不熟，别放一起！"🚧
+
+**Webpack 拍胸脯说："放着我来！"** 它就是来解决这些问题的**模块打包器(Module Bundler)**。它的核心任务：**把你项目中各种乱七八糟的、相互依赖的模块和资源，根据规则梳理、转换、合并，最终打包成少数几个（通常就是1个！）浏览器能愉快玩耍的标准静态资源文件 (.js, .css, .jpg等)。** 像极了把一堆散乱的乐高积木，组装成一辆酷炫的跑车！🏎️💨
+
+## 二、 Webpack 的核心三板斧：入口、Loader、插件
+
+理解这三个概念，Webpack 就懂了一半！（真的，没骗你！🤞）
+
+### 1. 入口 (Entry)：故事的起点
+
+想象一下侦探破案，总得有个最初的线索吧？Webpack 打包也一样！**入口(Entry)** 就是Webpack开始分析项目依赖关系的**起点文件**。通常就是你的`main.js`、`index.js`或者`App.jsx`这类主文件。
+
+告诉Webpack："老兄，从这个文件开始，给我挖！把它引用的所有文件（JS、CSS、图片...），以及这些文件引用的文件，统统找出来！" 🔍
+
+**配置示例：**
+```javascript
+// webpack.config.js
+module.exports = {
+  entry: './src/index.js', // 👉 看！这里就是入口文件路径
+  // ... 其他配置
+};
+
+### 2. Loader：让 Webpack 会"读"新类型文件，
+它们就像是翻译官 + 搬运工：
+翻译官： 把非JS资源转换成Webpack能理解的JavaScript模块（比如，把.css文件内容转换成一段创建<style>标签的JS代码）。
+搬运工： 处理文件（比如，把图片复制到输出目录，并返回处理后的URL）。css翻译成有style标签的JS 搬运各种类型的文件
+### 3. plugin:
+生成最终的HTML文件：自动把打包好的JS/CSS注入到HTML模板中 (HtmlWebpackPlugin - 神器！必装！✅）。
+优化代码体积：压缩JS (TerserWebpackPlugin)，压缩CSS (CssMinimizerWebpackPlugin)，删除未用代码 (Tree Shaking，Webpack内置支持)。
+环境变量管理：区分开发和生产配置 (DefinePlugin)。
+拷贝静态资源：把不需要处理的文件（如favicon.ico, robots.txt）直接复制到输出目录 (CopyWebpackPlugin)。
+分析打包结果：生成可视化的包大小报告 (BundleAnalyzerPlugin - 减肥必备！⚖️)。
+开发服务器：提供热更新(HMR) (webpack-dev-server - 开发体验飙升！🚀)。
