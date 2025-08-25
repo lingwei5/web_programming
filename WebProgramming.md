@@ -92,7 +92,7 @@ hr:网页的水平线 标签定义 HTML 页面中的主题变化（比如话题�
 16. s:定义加删除线的文本。表示不再准确或过时但未被删除的文本，如电子商务中的原价显示，一般独立使用.del表示内容被删除、替换，通常与ins一起使用，用于文档修订和版本控制
 17. sub/sup:定义下标或上标文本。sub:下标 sup:上标
 18. time:标签定义一个日期/时间。datetime属性指定日期/时间，如：`<time datetime="2021-01-01">2021年1月1日</time>`,以机器可读的方式对日期时间进行编码,能够把生日提醒或排定的事件添加到用户日程表中，搜索引擎也能够生成更智能的搜索结果
-19. wbr:work break
+19. wbr:word break
 ## 表单
 留学申请表 信息确认表等，是一个数据，含有非常多的不同信息，如电话 邮箱 年龄 职业 学历等;而table则是多个数据，所有的数据都有相同的字段;一个表单数据可以是表格数据里的一行数据
 1. form:定义一个表单，用于提交数据到服务器,可以包含以下一个或多个表单元素
@@ -288,8 +288,7 @@ https://www.runoob.com/cssref/css-selectors.html
 
 
 
-# Three.js
-# WebGL
+
 
 # AJAX
 AJAX = Asynchronous JavaScript and XML
@@ -305,9 +304,62 @@ Google搜索的suggest使ajax流行起来的，当在搜索框中输入字符时
 jQuery:一个快速、简洁的JavaScript库，简化了HTML文档遍历、事件处理、动画和Ajax交互
 
 # Java
+
+![alt text](Java代码运行过程.png)
+![alt text](JVM内存模型.png)
+
+JVM内存模型（Java Virtual Machine Memory Model），它定义了Java程序在运行时的内存结构和管理方式。JVM内存模型主要包括以下几个部分：
+
+​​1. 方法区（Method Area）​​：存储类信息、常量、静态变量、即时编译器编译后的代码等数据。在JDK 8之前，方法区由永久代（PermGen）实现，而JDK 8及以后使用元空间（Metaspace）实现，元空间位于本地内存（Native Memory）中。
+​2. ​堆（Heap）​​：Java对象实例和数组都在堆上分配内存，这是垃圾收集器管理的主要区域。堆可以细分为新生代（Young Generation）和老年代（Old Generation）。新生代又分为Eden区和两个Survivor区（通常称为From Survivor和To Survivor）。
+​3. ​虚拟机栈（Java Virtual Machine Stacks）​​：每个线程在创建时都会创建一个虚拟机栈，栈中保存栈帧（Stack Frame），每个方法调用都会创建一个栈帧。栈帧包括局部变量表、操作数栈、动态链接、方法返回地址等。
+4. ​​本地方法栈（Native Method Stack）​​：与虚拟机栈类似，但服务于Native方法（用其他语言编写的方法）。
+​5. ​程序计数器（Program Counter Register）​​：每个线程都有一个程序计数器，用于记录当前线程执行的字节码指令地址。如果执行的是Native方法，则计数器值为空（Undefined）。
+​6. ​直接内存（Direct Memory）​​：并不是JVM运行时数据区的一部分，但也被频繁使用。它是通过Native函数库直接分配的堆外内存，比如NIO使用DirectByteBuffer来操作直接内存。
+
+下面我们详细说明每个部分：
+1. 方法区（Method Area）
+存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等。
+在JDK 8之前，方法区由永久代（PermGen）实现，永久代的大小受JVM设置的最大永久代大小限制（-XX:MaxPermSize），容易导致内存溢出（如常见的java.lang.OutOfMemoryError: PermGen space）。
+JDK 8及以后，永久代被移除，取而代之的是元空间（Metaspace），元空间使用本地内存，因此默认情况下只受本地内存限制。可以通过参数-XX:MetaspaceSize和-XX:MaxMetaspaceSize设置初始大小和最大大小。
+2. 堆（Heap）
+堆是JVM管理的最大一块内存区域，几乎所有对象实例和数组都在这里分配内存。
+堆是垃圾收集器管理的主要区域，因此也称为GC堆（Garbage Collected Heap）。
+堆可以分为新生代和老年代：
+​​新生代​​：新创建的对象首先分配在新生代。新生代又分为：
+Eden区：新对象在此分配。
+Survivor区：分为From Survivor和To Survivor，用于存放经过Minor GC后仍然存活的对象。
+​​老年代​​：存放长期存活的对象（经过多次Minor GC仍然存活的对象）以及大对象（比如大数组，直接进入老年代）。
+堆的大小可以通过JVM参数设置：
+-Xms：堆初始大小
+-Xmx：堆最大大小
+-Xmn：新生代大小（通常为整个堆的1/3到1/4）
+-XX:SurvivorRatio：Eden区与Survivor区的比例（例如8表示Eden:Survivor=8:1:1）
+3. 虚拟机栈（Java Virtual Machine Stacks）
+每个线程在创建时都会创建一个虚拟机栈，栈中保存栈帧（Stack Frame）。
+每个方法调用都会创建一个栈帧，方法调用结束（正常返回或抛出异常）时栈帧被销毁。
+栈帧包括：
+​​局部变量表​​：存放方法参数和方法内部定义的局部变量。
+​​操作数栈​​：用于存放操作数，是执行字节码指令的工作区。
+​​动态链接​​：指向运行时常量池中该栈帧所属方法的引用，以便在运行时将符号引用转换为直接引用。
+​​方法返回地址​​：方法返回时，需要返回到调用该方法的地方继续执行。
+栈的大小可以通过参数设置：-Xss（例如-Xss1m）。
+4. 本地方法栈（Native Method Stack）
+与虚拟机栈类似，但服务于Native方法（用其他语言编写的方法）。
+在HotSpot虚拟机中，本地方法栈和虚拟机栈是合二为一的。
+5. 程序计数器（Program Counter Register）
+每个线程都有一个程序计数器，用于记录当前线程执行的字节码指令地址（如果当前执行的是Native方法，则计数器值为空）。
+程序计数器是线程私有的，生命周期与线程相同。
+它是唯一一个在JVM规范中没有规定任何OutOfMemoryError情况的区域。
+6. 直接内存（Direct Memory）
+直接内存并不是JVM运行时数据区的一部分，但它在Java程序中被频繁使用（例如NIO的DirectByteBuffer）。
+直接内存的分配不受Java堆大小的限制，但会受到本机总内存的限制。
+直接内存的读写速度通常比堆内存快，因为它避免了在Java堆和Native堆之间来回复制数据。
+
 package com.example.demo;//包声明，就是个命名空间，防止命名冲突，包名一般用小写字母，一般约定就是xxx.java的文件路径
 import 的原理是编译时解析，导出引用或者地址
-注解:本质就是一个接口，继承自java.lang.annotation.Annotation,为Java 类或方法提供额外的元数据机制，类似Qt的moc\dicom的meta等，这些信息可以在编译时、加载时或运行时被读取和处理。注解本身不会直接影响代码逻辑，但可以通过其他工具（如编译器、框架等）来改变程序的行为或生成额外的代码
+
+注解:本质就是一个接口，继承自java.lang.annotation.Annotation,为Java 类或方法、参数等程序元素提供额外的元数据机制，类似Qt的moc\dicom的meta等，这些信息可以在编译时、加载时或运行时被读取和处理。注解本身不会直接影响代码逻辑，但可以通过其他工具（如编译器、框架等）来改变程序的行为或生成额外的代码
 使用注解时，实际上是使用接口的实例,使用反射机制修饰代码
 注解的作用：
 ​- ​编译检查​​：例如@Override注解用于指示方法覆盖了父类的方法，编译器会检查是否真的覆盖，如果没有则报错。
@@ -315,12 +367,24 @@ import 的原理是编译时解析，导出引用或者地址
 ​- ​代码分析​​：通过注解，工具可以在编译时或运行时分析代码，例如生成代码、进行验证等。
 ​- ​框架配置​​：在框架中广泛使用，例如Spring中的@Controller、@Autowired等，用于配置组件和依赖注入。
 
+注解的参数是键值对的形式,参数类型只能是基本类型、String、Class、枚举、注解、以及这些类型的数组。有默认值的可以不写,只有一个value参数时可省略value键
+
 元注解:注解的注解
-@Retention - 保留策略
-@Target - 作用目标
-@Documented - 文档收录
-@Inherited - 继承特性
-@Repeatable - 重复注解
+@Retention - 标记的注解的保留策略
+	RetentionPolicy.SOURCE: 注解只在源代码中保留，编译时被忽略。
+	RetentionPolicy.CLASS: 注解在编译时被保留到 class 文件中，但在运行时被 JVM 忽略（默认行为）。
+	RetentionPolicy.RUNTIME: 注解在运行时也被保留，因此可以通过反射机制读取到。
+@Target - 作用目标 定义了被标记的注解可以应用于哪些程序元素
+	ElementType.TYPE: 可以用于类、接口（包括注解类型）或枚举声明。
+	ElementType.FIELD: 可以用于字段（包括枚举常量）。
+	ElementType.METHOD: 可以用于方法。
+	ElementType.PARAMETER: 可以用于参数。
+	ElementType.CONSTRUCTOR: 可以用于构造函数。
+	ElementType.LOCAL_VARIABLE: 可以用于局部变量。
+	ElementType.ANNOTATION_TYPE: 可以用于注解
+@Documented - 文档收录 表示被标记的注解应该由 javadoc 工具记录。默认情况下，javadoc 是不会包含注解的，但如果一个注解被 @Documented 标记，那么它会被包含在生成的文档中。
+@Inherited - 继承特性 表示被标记的注解@A可以被子类继承,在父类Parent上使用@A注解时,子类Child也会继承@A注解
+@Repeatable - 重复注解 表示一个注解可使用多次 如多个作者、标签等，使用@Repeatable时，必须定义一个容器注解（如@Authors），其value类型是重复注解的数组
 
 @interface - 定义注解
 interface - 定义接口
@@ -362,6 +426,7 @@ Spring MVC注解：
 	@Aspect: 声明一个切面。
 	@Pointcut: 定义切点表达式。
 	@Before, @After, @AfterReturning, @AfterThrowing, @Around: 定义通知类型（在切点之前、之后等执行）。
+	@EnableAspectJAutoProxy: 启用Spring AOP自动代理。
 Spring Boot特有注解：
 	@SpringBootApplication: 用于主配置类，是@Configuration、@EnableAutoConfiguration和@ComponentScan的组合。
 	@EnableAutoConfiguration: 启用Spring Boot的自动配置机制。
@@ -398,6 +463,195 @@ Spring Boot特有注解：
 ![alt text](Spring框架全家桶架构.png)
 ![alt text](SpringMVC原理架构.png)
 
+
+## Spring框架
+Spring 框架的核心机制和原理。Spring 的核心可以概括为 IoC（控制反转） 和 AOP（面向切面编程），而这一切都建立在它的容器（Container） 之上。Spring 容器负责管理对象的生命周期，包括对象的创建、配置和销毁等。Spring 容器通过依赖注入（Dependency Injection）的方式将对象之间的依赖关系交给容器管理，从而实现了松耦合的设计。
+
+**一、核心思想：IoC（控制反转）与 DI（依赖注入）**
+要理解 Spring，首先必须彻底理解这两个概念。
+
+什么是控制反转 (IoC)？
+
+传统程序：在传统应用程序中，对象自己控制其依赖的创建和查找。比如，A 类需要 B 类，那么 A 内部会通过 new B() 来创建依赖。控制权在程序本身。
+
+IoC 程序：控制权被反转了。对象的创建、组装、管理权交给了外部容器（Spring Container）。你不再需要自己 new 对象，而是由容器主动帮你创建好并注入到需要的地方。控制权从程序代码转移到了外部容器。
+
+什么是依赖注入 (DI)？
+
+DI 是 IoC 的实现方式。控制反转是一个设计思想，而依赖注入是这个思想的具体实现。它的意思是：容器通过设置器方法（Set注入）或构造函数（构造器注入）等方式，将依赖对象注入到被调用的对象中。
+
+**二、核心机制：Spring 容器与 Bean**
+Spring 机制的核心就是一个“超级工厂”，也就是 IoC 容器，它负责管理所有被称为 Bean 的对象。
+
+1. IoC 容器 (Container)
+Spring 容器是 Spring 框架的“心脏”，它主要负责：
+
+实例化 应用程序中的 Bean。
+
+配置 这些 Bean（例如设置属性、注入依赖）。
+
+组装 Bean 之间的关系（依赖注入）。
+
+管理 Bean 的整个生命周期（从创建到销毁）。
+
+主要的容器接口是 BeanFactory，但其更强大的子接口 ApplicationContext（应用上下文）更为常用。我们通常通过 ApplicationContext 来与容器交互。
+
+2. Bean
+在 Spring 中，那些由 IoC 容器创建和管理的对象统称为 Bean。Bean 就是应用程序的基石。
+
+如何定义一个 Bean？
+
+XML 配置（古老方式）：在 applicationContext.xml 文件中使用 <bean> 标签定义。
+
+注解配置（现代方式）：在 Java 类上使用注解（如 @Component, @Service, @Controller, @Repository）来声明一个 Bean。
+
+Java 配置（现代方式）：在配置类中使用 @Configuration 和 @Bean 注解来定义。
+
+**三、Spring 的核心工作原理与流程**
+Spring 容器启动时，会做一系列复杂的工作，其核心流程可以简化为以下几个步骤：
+
+步骤 1：加载与解析配置 (Configuration Loading)
+容器启动时，首先会读取配置文件（XML、注解或 Java Config），解析这些配置信息，确定哪些对象需要被管理，以及它们之间的依赖关系。
+
+步骤 2：Bean 定义与注册 (Bean Definition)
+解析后的配置信息会被转换为一个个 BeanDefinition 对象。BeanDefinition 是 Spring 的核心元数据，它包含了创建一个 Bean 所需要的所有信息，例如：
+
+这个 Bean 的类名是什么？
+
+它是单例还是原型（多例）？
+
+它的依赖有哪些？
+
+它的属性值是什么？
+
+所有这些 BeanDefinition 会被注册到一个 “Bean 定义注册表” 中，你可以把它想象成容器的“花名册”。
+
+步骤 3：Bean 的实例化与依赖注入 (Instantiation & DI) - 核心中的核心
+这是最关键的阶段。容器（特别是 BeanFactory）会根据 BeanDefinition 的信息来创建 Bean 实例。这个过程通常是懒加载的（除非配置为急切加载），即在第一次被请求时才创建。
+
+实例化：容器使用 Java 反射机制调用类的构造函数来创建 Bean 的实例。
+
+属性填充（依赖注入）：容器解析该 Bean 的依赖关系（通过 @Autowired 等注解或 XML 配置标识），然后从容器中获取这些依赖的 Bean，并通过反射调用 setter 方法或直接通过构造函数将它们注入进去。
+
+初始化：如果 Bean 实现了 InitializingBean 接口，容器会调用其 afterPropertiesSet() 方法。或者，如果配置了自定义的 init-method，也会在此阶段调用。此时，Bean 已经准备就绪，可以使用了。
+
+步骤 4：AOP（面向切面编程）
+如果配置了 AOP，容器会在 Bean 的初始化前后阶段，动态地生成代理对象。
+
+Spring AOP 默认使用动态代理：
+
+如果目标对象实现了接口 -> 使用 JDK 动态代理。
+
+如果目标对象没有实现接口 -> 使用 CGLIB 字节码增强。
+
+代理对象会负责在目标方法执行前后，织入切面逻辑（如日志、事务、安全等）。
+
+最终，存放在容器里、被应用程序获取到的，很多时候是这个代理对象，而不是原始的 Bean 对象。
+
+步骤 5：Bean 的使用与销毁
+使用：应用程序通过 applicationContext.getBean() 或更常用的 @Autowired 注解从容器中获取完整的、注入好所有依赖的 Bean 来使用。
+
+销毁：当容器关闭时，它会管理 Bean 的销毁生命周期。如果 Bean 实现了 DisposableBean 接口，容器会调用其 destroy() 方法，或者执行配置的自定义 destroy-method。
+
+**四、关键特性与机制详解**
+1. Bean 的作用域 (Scope)
+Spring Bean 默认是单例的（Singleton），但支持多种作用域：
+
+singleton：（默认）每个 Spring 容器中只有一个实例。
+
+prototype：每次请求都会创建一个新的实例。
+
+request：每次 HTTP 请求创建一个实例（Web 环境）。
+
+session：每个 HTTP Session 创建一个实例（Web 环境）。
+
+2. 自动装配 (Autowiring)
+Spring 容器可以自动解析 Bean 之间的协作关系。通过 @Autowired 注解，容器会自动在上下文中查找匹配的 Bean 并注入进去。其背后的匹配规则通常是按类型（byType），如果找到多个相同类型的 Bean，再按名称（byName）进行匹配。
+
+3. 事务管理
+Spring 提供了声明式事务管理，其底层原理就是 AOP。
+
+你在方法或类上添加 @Transactional 注解。
+
+Spring 会为这个类创建一个代理对象。
+
+当你调用代理对象的方法时，代理会在方法执行前开启事务，在方法执行后提交事务，如果遇到异常则回滚事务。
+
+这一切对开发者来说是透明的，无需编写重复的事务管理代码。
+
+**总结**
+Spring 的机制原理可以概括为：
+
+一个核心容器：ApplicationContext，它是所有 Bean 的“家”。
+
+一个设计思想：IoC，将对象的控制权交给容器。
+
+一个实现手段：DI，容器通过反射机制将依赖注入到对象中。
+
+一个增强利器：AOP，通过动态代理无侵入地增强Bean的功能（如事务、日志）。
+
+一套定义规则：BeanDefinition，它是容器创建和管理 Bean 的“蓝图”。
+
+正是这些机制的结合，使得 Spring 能够有效地组织和管理大型企业级应用，让开发者专注于业务逻辑，而不是复杂的对象依赖管理。
+
+## Spring AOP
+**一、AOP含义及作用**
+AOP 的全称是 Aspect-Oriented Programming。它的核心思想是：将那些遍布在应用程序多个模块中的、与核心业务逻辑无关的通用功能（称为“横切关注点”）抽离出来，集中管理和维护，然后再通过声明的方式将它们“织入”到业务代码中。
+
+传统的OOP:
+代码混乱：核心业务代码中混杂了大量非核心的代码。
+
+代码分散：同样的日志、事务代码重复出现在无数个方法里。
+
+维护困难：如果要修改，极易出错。
+
+**二、AOP 的核心术语 (Core Concepts)**
+理解这些术语是理解 AOP 的关键：
+
+Aspect (切面)
+
+是什么：将横切关注点模块化的特殊对象。它是一个类，包含了通知和切点。例如：LoggingAspect（日志切面）、TransactionAspect（事务切面）。
+
+Join Point (连接点)
+
+是什么：程序执行过程中一个明确的点，通常是方法的调用、异常的抛出等。在 Spring AOP 中，连接点总是代表一个方法的执行。
+
+Advice (通知)
+
+是什么：切面在特定连接点上执行的动作。它本身是一段代码，比如一个方法。通知定义了“做什么”和“何时做”。
+
+主要类型：
+
+Before Advice：在目标方法被调用之前执行。
+
+After Returning Advice：在目标方法成功执行完成后执行。
+
+After Throwing Advice：在目标方法抛出异常后执行。
+
+After (Finally) Advice：无论目标方法如何结束（成功或异常），之后都会执行。
+
+Around Advice：最强大的通知，它包围了连接点。可以在方法调用前后执行自定义行为，并决定是否继续执行连接点。
+
+Pointcut (切点)
+
+是什么：一个匹配连接点的表达式。通知是与一个切点表达式关联的。它定义了“在何处做”。
+
+关键：切点决定了哪个类的哪个方法会收到通知。例如：表达式 execution(* com.example.service.*.*(..)) 匹配 service 包下所有类的所有方法。
+
+Weaving (织入)
+
+是什么：将切面应用到目标对象并创建代理对象的过程。这可以在编译期、类加载期或运行期实现。Spring AOP 是在运行时完成织入的。
+
+Target Object (目标对象)
+
+是什么：被一个或多个切面所通知的对象。也就是需要被增强的原始业务对象。
+
+AOP Proxy (AOP 代理)
+
+是什么：AOP 框架为了实现切面功能而创建的对象。在 Spring 中，这个代理可以是 JDK 动态代理或 CGLIB 代理。客户端代码调用的实际上是这个代理对象，而不是原始的目标对象。
+
+
+
 ## servlet
 web技术演进:
 静态网页1991-1995 无js--> 动态网页php95 js95 servelet/jsp97--->web2.0 ajax 2005 jQuery AngularJS--->web3.0 2010 react vue angular--->web4.0 2018 WebAssembly webGPU WebXR
@@ -430,8 +684,8 @@ HttpServlet extends GenericServlet implements Servlet,ServletConfig
 HttpServletRequest implent ServletRequest 
 HttpServletResponse implent ServletResponse 
 
-
-# 服务器 容器
+# web部署
+## 服务器 容器
 web服务器 应用服务器 servlet容器 
 
 一、核心概念与比喻
@@ -539,11 +793,14 @@ Servlet 容器:
 2. Eclipse Jetty:轻量级 Servlet 容器，适合嵌入式应用
 
 
-# 前端打包
+## 前端打包
+
+重点是各种选项 服务器 数据库等的配置，业务配置等
 
 > 还在为满屏的`<script>`标签和混乱的依赖关系抓狂吗？🤯 让Webpack来拯救你的前端项目吧！它不是魔术，但效果堪比魔术！✨
 
-## 一、 当项目变胖了：我们为啥需要打包？
+### 
+一、 当项目变胖了：我们为啥需要打包？
 
 记得早些年写网页吗？一个`index.html`里塞十几个`<script src="...">`标签（噩梦啊！！！），手动管理加载顺序（这个库依赖那个库，先加载谁？🤔），文件体积大加载慢（用户跑了...😭）。稍微大点的项目？直接原地爆炸！💥
 
@@ -557,32 +814,133 @@ Servlet 容器:
 
 **Webpack 拍胸脯说："放着我来！"** 它就是来解决这些问题的**模块打包器(Module Bundler)**。它的核心任务：**把你项目中各种乱七八糟的、相互依赖的模块和资源，根据规则梳理、转换、合并，最终打包成少数几个（通常就是1个！）浏览器能愉快玩耍的标准静态资源文件 (.js, .css, .jpg等)。** 像极了把一堆散乱的乐高积木，组装成一辆酷炫的跑车！🏎️💨
 
-## 二、 Webpack 的核心三板斧：入口、Loader、插件
+### 二、 Webpack 的核心三板斧：入口、Loader、插件
 
 理解这三个概念，Webpack 就懂了一半！（真的，没骗你！🤞）
 
-### 1. 入口 (Entry)：故事的起点
+#### 1. 入口 (Entry)：故事的起点
 
 想象一下侦探破案，总得有个最初的线索吧？Webpack 打包也一样！**入口(Entry)** 就是Webpack开始分析项目依赖关系的**起点文件**。通常就是你的`main.js`、`index.js`或者`App.jsx`这类主文件。
 
 告诉Webpack："老兄，从这个文件开始，给我挖！把它引用的所有文件（JS、CSS、图片...），以及这些文件引用的文件，统统找出来！" 🔍
 
 **配置示例：**
-```javascript
+"'javascript
 // webpack.config.js
 module.exports = {
   entry: './src/index.js', // 👉 看！这里就是入口文件路径
   // ... 其他配置
 };
+'"
 
-### 2. Loader：让 Webpack 会"读"新类型文件，
+#### 2. Loader：让 Webpack 会"读"新类型文件，
 它们就像是翻译官 + 搬运工：
 翻译官： 把非JS资源转换成Webpack能理解的JavaScript模块（比如，把.css文件内容转换成一段创建<style>标签的JS代码）。
 搬运工： 处理文件（比如，把图片复制到输出目录，并返回处理后的URL）。css翻译成有style标签的JS 搬运各种类型的文件
-### 3. plugin:
+#### 3. plugin:
 生成最终的HTML文件：自动把打包好的JS/CSS注入到HTML模板中 (HtmlWebpackPlugin - 神器！必装！✅）。
 优化代码体积：压缩JS (TerserWebpackPlugin)，压缩CSS (CssMinimizerWebpackPlugin)，删除未用代码 (Tree Shaking，Webpack内置支持)。
 环境变量管理：区分开发和生产配置 (DefinePlugin)。
 拷贝静态资源：把不需要处理的文件（如favicon.ico, robots.txt）直接复制到输出目录 (CopyWebpackPlugin)。
 分析打包结果：生成可视化的包大小报告 (BundleAnalyzerPlugin - 减肥必备！⚖️)。
 开发服务器：提供热更新(HMR) (webpack-dev-server - 开发体验飙升！🚀)。
+
+## 前端打包工具对比
+vite
+rollup
+webpack
+Parcel
+
+## Java Bean
+Java Bean
+一种技术规范，本质是一个遵循特定编码约定的 Java 类, 为了实现组件的可重用性、 interoperability（互操作性）和便于工具、框架操作
+JSP、Swing GUI 设计、以及几乎所有主流 Java 框架（Spring, Hibernate等）都广泛使用了 Java Bean。
+Java Bean 是一种符合特定规范的 Java 类，用于封装数据和方法。Java Bean 的主要特点包括：
+1. 公共无参构造方法。
+2. 私有属性
+3. 公共的 Getter/Setter，通过 getter 和 setter 方法访问和修改属性。
+4. (可选)实现了 Serializable 接口，以便对象可以被序列化。
+
+Java Bean 的用途和重要性
+Java Bean 的设计初衷是“一次编写，随处运行，随处使用”。它的重要性体现在：
+1. 框架集成：现代 Java 生态系统（如 Spring, Hibernate, Jakarta EE）严重依赖 Java Bean 约定。Spring 容器管理的对象（@Component, @Service, @Bean 等）本质上都是增强版的 Java Beans。
+
+2. 工具支持：IDE（如 IntelliJ IDEA, Eclipse）可以基于这些约定提供强大的代码自动完成、重构和可视化设计工具。
+
+3. 可重用性：标准的访问方式 (get/set) 使得组件可以在不同的应用程序和环境中被复用。
+
+4. 反射：框架利用反射（Reflection） 机制，通过分析 Getter 和 Setter 的方法名（如 setName）来动态地发现和操作 Bean 的属性（name）。这就是为什么方法命名如此重要的原因。
+
+Spring Bean是一个被 Spring IoC 容器所实例化、组装和管理的对象。任何一个 Java Bean（或任何普通的 Java 类）都可以被 Spring 定义为一个 Spring Bean。Spring Bean 是 Java Bean 概念的扩展和具体应用。
+
+## Jar war ear
+Java Archive (JAR) 文件是一种用于聚合许多 Java 类文件、相关的元数据和资源（文本、图片等）的文件格式。JAR 文件使用 ZIP 文件格式，因此它支持 ZIP 文件的所有特性，如压缩和加密。
+
+JAR、WAR 和 EAR 是三种不同用途的打包文件格式，用于将应用程序、模块或库组织成一个可部署的单元。
+
+它们本质上都是基于ZIP压缩格式的文件，使用相同的压缩算法，但内部结构和用途有明确区别。
+
+1. JAR (Java ARchive)
+用途： 打包Java类文件、相关的元数据和资源（如文本、图片等）成为一个独立的文件。
+
+包含内容：
+
+	编译后的 .class 文件
+
+	应用程序资源（如 .properties 属性文件、图像、图标等）
+
+	一个可选的 META-INF/MANIFEST.MF 文件，用于指定主类、版本信息、类路径依赖等。
+
+运行方式：
+
+	通常作为库（Libraries） 被其他项目引用。
+
+	如果指定了主类（Main-Class），也可以通过 java -jar your-application.jar 命令直接运行。
+
+类比： 一个普通的工具盒。里面装着各种工具（类和方法），既可以单独使用（可执行JAR），也可以被拿到另一个大项目里作为一套工具使用（库JAR）。
+
+现代应用： Spring Boot 应用就打包成一个可执行的JAR，它内嵌了Tomcat等Web服务器，使得无需单独部署到外部应用服务器即可运行。
+
+2. WAR (Web ARchive)
+用途： 专门用于打包和部署标准的Java Web应用程序。
+
+包含内容： 一个WAR包包含了Web应用的所有内容，其结构必须遵循特定的目录约定：
+
+	/WEB-INF/： 核心目录，此目录下的文件客户端无法直接访问。
+
+	/WEB-INF/classes/： 存放编译后的项目Java类文件（.class）。
+
+	/WEB-INF/lib/： 存放项目依赖的所有第三方JAR文件。
+
+	/WEB-INF/web.xml： Web部署描述符（在旧版Servlet规范中是必须的，新版中可选）。
+
+	/META-INF/： 类似JAR的元信息目录。
+
+	静态Web资源： 如 .html, .jsp, .css, .js, 图片等，通常直接放在根目录或子文件夹下。
+
+运行方式： 
+	必须部署到一个Web容器（或Servlet容器）中才能运行，例如 Tomcat, Jetty, IBM WebSphere 等。容器会解压WAR包并为其提供运行时环境。
+
+类比： 一个宜家家具的扁平封装盒。里面包含了所有木板、螺丝、说明书（Web资源），但你需要一个房间（Web容器）和工具（容器提供的服务）才能把它组装成一件可用的家具（可访问的Web应用）。
+
+3. EAR (Enterprise ARchive)
+用途： 打包和部署完整的Java企业级应用程序（J2EE/Jakarta EE应用）。它是一个聚合体，可以包含多个模块。
+
+包含内容： 一个EAR包就像一个容器，可以包含以下模块：
+
+	零个或多个 WAR 模块（用于Web层）。
+
+	零个或多个 EJB JAR 模块（用于业务逻辑层，包含Enterprise JavaBeans）。
+
+	零个或多个 客户端应用JAR 模块。
+
+	一个 META-INF/application.xml 文件，这是部署描述符，用于描述EAR中包含哪些模块以及如何组装它们。
+
+运行方式： 
+	必须部署到一个功能完整的Java应用服务器（Application Server）中才能运行，例如 WildFly (JBoss), WebLogic, WebSphere 等。应用服务器不仅提供Web容器功能，还提供EJB容器、JMS、JTA等全套企业级服务。
+
+类比： 一个搬家公司的整个货箱。这个货箱里包含了各个房间的家具（WAR）、工具箱（EJB JAR）、甚至还有一本总的物品清单和摆放说明（application.xml）。你需要一整套房子（应用服务器）才能安置这个货箱里的所有东西。
+
+
+# Three.js
+# WebGL
