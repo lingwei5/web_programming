@@ -942,5 +942,368 @@ JAR、WAR 和 EAR 是三种不同用途的打包文件格式，用于将应用�
 类比： 一个搬家公司的整个货箱。这个货箱里包含了各个房间的家具（WAR）、工具箱（EJB JAR）、甚至还有一本总的物品清单和摆放说明（application.xml）。你需要一整套房子（应用服务器）才能安置这个货箱里的所有东西。
 
 
+# SQL
+数据操作语言分为4种
+1. DDL（Data Definition Language）：数据定义语言，用来定义数据库中的对象（如：数据库、表、索引、存储过程、触发器等）。
+2. DML（Data Manipulation Language）：数据操作语言，用来对数据库表中的数据进行增删改操作。
+3. DCL（Data Control Language）：数据控制语言，用来控制用户对数据库的访问权限。
+4. DQL（Data Query Language）：数据查询语言，用来查询数据库中的数据。
+
+## DDL
+1. 数据库
+	创建数据库：create database db1
+
+	删除数据库：drop database db1
+
+	切换数据库：use db1
+
+	修改数据库：alter database db1 charset utf8;修改数据库的引擎 字符类型等等属性
+2. 表
+	创建表：create table student (id int constraint primary key, name varchar(20), age int);
+
+	删除表：drop table student;
+
+	修改表：alter table student add gender varchar(10);
+
+	重命名表：alter table student rename to student_info;
+	
+	清空表记录：truncate table student;
+
+	清空字段: delete
+
+## DML
+1. 插入数据
+   INSERT INTO 表名(字段1,字段2,字段3…字段n) VALUES(值1,值2,值3…值n);插入完整数据
+   
+   INSERT INTO 表名(字段1,字段2,字段3…) VALUES (值1,值2,值3…);插入指定字段
+
+   INSERT INTO 表名 VALUES (值1,值2,值3…值n),
+							(值1,值2,值3…值n),
+							(值1,值2,值3…值n); //插入多条记录
+2. 修改数据
+   update 表名 set 字段1=值1,字段2=值2,…字段n=值n where 条件;
+   UPDATE mysql.user SET password=password(‘123’)
+	where user=’root’ and host=’localhost’;
+3. 删除数据
+	DELETE FROM mysql.user
+	WHERE password=’’;删除密码为空的记录
+## DCL
+1. 创建用户
+   create user 'username'@'localhost' identified by 'password';指定ip登录
+   create user 'username'@'%' identified by 'password';任意ip登录
+2. 删除用户
+	drop user 'username'@'localhost';	
+3. 授权 grant
+4. 撤销授权 revoke
+5. 查看权限
+   show grants for 'username'@'localhost';
+
+## DQL
+1. 简单查询
+	#简单查询
+	SELECT id,name,sex,age,hire_date,post,post_comment,salary,office,depart_id
+	FROM employee;
+	SELECT * FROM employee;
+	SELECT name,salary FROM employee;
+	#避免重复DISTINCT
+	SELECT DISTINCT post FROM employee;
+	#通过四则运算查询
+	SELECT name, salary*12 FROM employee;
+	SELECT name, salary*12 AS Annual_salary FROM employee;
+	SELECT name, salary*12 Annual_salary FROM employee;
+	#定义显示格式
+	CONCAT() 函数用于连接字符串
+	SELECT CONCAT('姓名: ',name,' 年薪: ', salary*12) AS Annual_salary
+	FROM employee;
+	CONCAT_WS() 第一个参数为分隔符
+	SELECT CONCAT_WS(':',name,salary*12) AS Annual_salary
+	FROM employee;
+
+2. 单表关键字查询
+	(1) where 约束
+	where字句中可以使用：
+	比较运算符：><>= <= <> !=
+	between 80 and 100 值在10到20之间
+	in(80,90,100) 值是10或20或30
+	like 'egon%'
+	pattern可以是%或_，
+	%表示任意多字符
+	_表示一个字符
+	逻辑运算符：在多个条件直接可以使用逻辑运算符 and or not
+
+	View Code
+	(2)group by 分组查询
+	*为何要分组
+	#1、首先明确一点：分组发生在where之后，即分组是基于where之后得到的记录而进行的
+	#2、分组指的是：将所有记录按照某个相同字段进行归类，比如针对员工信息表的职位分组，或者按照性别进行分组等
+	#3、为何要分组呢？
+	取每个部门的最高工资
+	取每个部门的员工数
+	取男人数和女人数
+	小窍门：‘每’这个字后面的字段，就是我们分组的依据
+	#4、大前提：
+	可以按照任意字段分组，但是分组完毕后，比如group by post，只能查看post字段，如果想查看组内信息，需要借助于聚合函数
+
+	*ONLY_FULL_GROUP_BY
+	mysql >set global sql_mode="ONLY_FULL_GROUP_BY";#只能取分组的字段
+	分组之后，只能取分组的字段，以及每个组聚合结果
+
+	ONLY_FULL_GROUP_BY的语义就是确定select target list中的所有列的值都是明确语义，
+	简单的说来，在ONLY_FULL_GROUP_BY模式下，target list中的值要么是来自于聚集函数的结果，
+	要么是来自于group by list中的表达式的值。
+
+	*使用group by
+	View Code 
+	* 聚合函数
+	#强调：聚合函数聚合的是组的内容，若是没有分组，则默认一组
+
+	示例：
+	SELECT COUNT(*) FROM employee;
+	SELECT COUNT(*) FROM employee WHERE depart_id=1;
+	SELECT MAX(salary) FROM employee;
+	SELECT MIN(salary) FROM employee;
+	SELECT AVG(salary) FROM employee;
+	SELECT SUM(salary) FROM employee;
+	SELECT SUM(salary) FROM employee WHERE depart_id=3;
+
+	(3)having 过滤查询
+	HAVING与WHERE不一样的地方在于!!!!!!
+
+	#！！！执行优先级从高到低：where > group by > having
+	#1. Where 发生在分组group by之前，因而Where中可以有任意字段，但是绝对不能使用聚合函数。
+
+	#2. Having发生在分组group by之后，因而Having中可以使用分组的字段，无法直接取到其他字段,可以使用聚合函数
+
+	练习题
+
+	2. 查询各岗位内包含的员工个数小于2的岗位名、岗位内包含员工名字、个数
+	3. 查询各岗位平均薪资大于10000的岗位名、平均工资
+	4. 查询各岗位平均薪资大于10000且小于20000的岗位名、平均工资
+
+	select post,group_concat(name),count(id) from employee group by post;
+	select post,group_concat(name),count(id) from employee group by post having count(id)<2;
+	select post,avg(salary) from employee group by post having avg(salary)>10000;
+	select post,avg(salary) from employee group by post having avg(salary) between 10000 and 20000;
+
+	(4)查询排序order by
+	select * from employee order by age asc; #升序
+	select *from employee order by age desc; #降序
+
+	select * from employee order by age asc,id desc # 先按照age升序，如果age相同则按照ID降序
+
+	(5)限制查询的记录数:LIMIT
+	select * from employee limit 3;
+	select * from employee order by salary desc limit 1;
+
+	select * from employee limit 0,5;
+	#从第0开始，即先查询出第一条，然后包含这一条在内往后查5条
+	select * from employee limit 5,5;
+	#从第5开始，即先查询出第6条，然后包含这一条在内往后查5条
+
+	(6)使用正则表达式查询
+	#正则表达式
+	select * from employee where name like "jin%";
+
+	select *from employee where name regexp "^jin";
+	select * from employee where name regexp "^jin.*(g|n)$"; # 以jin开头，以g或者n结尾的姓名
+
+	小结：对字符串匹配的方式
+	WHERE name = 'egon';
+	WHERE name LIKE 'yua%';
+	WHERE name REGEXP 'on$';
+
+3. 多表连接查询
+建表
+create table department(
+id int,
+name varchar(20) 
+);
+
+create table employee(
+id int primary key auto_increment,
+name varchar(20),
+sex enum('male','female') not null default 'male',
+age int,
+dep_id int
+);
+
+#插入数据
+insert into department values
+(200,'技术'),
+(201,'人力资源'),
+(202,'销售'),
+(203,'运营');
+
+insert into employee(name,sex,age,dep_id) values
+('egon','male',18,200),
+('alex','female',48,201),
+('wupeiqi','male',38,201),
+('yuanhao','female',28,202),
+('liwenzhou','male',18,200),
+('jingliyang','female',18,204)
+;
+
+
+(1)多表连接查询
+	#交叉连接：不适用任何匹配条件。生成笛卡尔积
+
+	mysql> select * from employee,department;
+
+	#内连接：只连接匹配的行,只取两张表的共同部分
+
+	select * from employee,department where employee.dep_id = department.id;
+	select * from employee inner join department on employee.dep_id = department.id;
+
+	左连接：在内连接的基础上保留左表的记录
+	select * from employee left join department on employee.dep_id = department.id;
+
+	右连接：在内连接的基础上保留右表的记录
+	select * from employee right join department on employee.dep_id = department.id;
+
+	全外连接： 在内连接的基础上保留左右两表没有对应关系的记录
+	select * from employee full join department on employee.dep_id = department.id;
+	但因为MYSQL不支持full jion 的操作。
+
+	所以必须把左连接的和右连接进行联合（union）去重。
+	select * from employee left join department on employee.dep_id = department.id
+	union
+	select * from employee right join department on employee.dep_id = department.id;
+
+(2)符合条件连接查询
+	#查询平均年龄大于30岁的部门名
+	select department.name,avg(age) from employee inner join department on employee.dep_id = department.id
+	group by department.name
+	having avg(age)>30;
+
+(3)子查询
+	#1：子查询是将一个查询语句嵌套在另一个查询语句中。
+	#2：内层查询语句的查询结果，可以为外层查询语句提供查询条件。
+	#3：子查询中可以包含：IN、NOT IN、ANY、ALL、EXISTS 和 NOT EXISTS等关键字
+	#4：还可以包含比较运算符：= 、 !=、> 、<等
+
+	*带IN关键字的子查询
+	查询平均年龄在25岁以上的部门名
+	select * from department where id in
+	(select dep_id from employee
+	group by dep_id
+	having avg(age)>25);
+
+	*带比较运算符的子查询
+	查询大于所以人平均年龄的员工名与年龄
+	select name,age from employee where age>
+	(select avg(age) from employee);
+	#查询大于部门内平均年龄的员工名与年龄
+	select t1.name,t1.age from employee as t1 inner join
+	(select dep_id,avg(age)as avg_age from employee
+	group by dep_id)as t2 on t1.dep_id =t2.dep_id where t1.age >t2.avg_age;
+
+	*带EXISTS关键字的子查询
+	select * from employee
+	where exists
+	(select id from department where id =200);
+
+五.关键字逻辑查询语句
+*SELECT语句关键字的定义顺序
+
+SELECT DISTINCT <select_list>
+FROM <left_table>
+<join_type> JOIN <right_table>
+ON <join_condition>
+WHERE <where_condition>
+GROUP BY <group_by_list>
+HAVING <having_condition>
+ORDER BY <order_by_condition>
+LIMIT <limit_number>
+
+*SELECT语句关键字的执行顺序
+(7)     SELECT 
+(8)     DISTINCT <select_list>
+(1)     FROM <left_table>
+(3)     <join_type> JOIN <right_table>
+(2)     ON <join_condition>
+(4)     WHERE <where_condition>
+(5)     GROUP BY <group_by_list>
+(6)     HAVING <having_condition>
+(9)     ORDER BY <order_by_condition>
+(10)    LIMIT <limit_number>
+
+
+1.先从库,表里找
+2.on 后面加两表连接的限制条件
+3.将两表连接起来（内左右全等）
+4.从约束条件where里过滤出数据
+5.然后交给group by 进行分组，
+6.分完组后 用having 过滤
+7.之后才是运行select 后面的语句，
+8.distinct进行去重
+9.接着轮到order by 排序
+10.limit 最后运行
+
+## SQL查询语句
+查询语法很多
+别名 增强可读性 
+select column1 as col_alias_name from table;列别名
+select column1 from table as tab_alias_name;表别名，多个表查询时，别名简写很方便
+
+1. 普通查询
+   1. select * from table; #查询所有
+   2. select name,age from table; #查询指定字段
+2. 条件查询where子句
+   select name,age from table where age>20; #查询指定条件
+   select name,age from table where age>20 and age<30; #查询多个条件
+   select name,age from table where age between 20 and 30; #查询多个条件
+
+   - 比较运算符：>、<、>=、<=、=、<>、!=
+   - 逻辑运算符：and、or、not 如where department='技术' and age>20
+   - 范围查询：between and 如where salary between 10000 and 20000
+   - 集合查询: in 如where department in ('技术','运营')
+   - 模糊查询：like 如where name like '张%'，%表示任意多个字符，_表示一个字符
+   - 空值判断: is null, is not null,不能使用=NULL,!=NULL来判断
+   
+3. join 
+	根据多个表之间相关列的关系，从这些表中查询数据
+	JOIN 允许你将不同表中的行组合起来，基于它们之间的共同字段（通常是外键关系）
+   	SELECT column1, column2, ...
+	FROM table1
+	JOIN table2 ON condition;
+   - INNER JOIN：只连接匹配的行
+   - LEFT JOIN：在内连接的基础上保留左表的记录
+   - RIGHT JOIN：在内连接的基础上保留右表的记录
+   - FULL OUT JOIN:返回两个表的并集
+   - CROSS JOIN:返回两个表的笛卡尔积,每条左表记录与每条右表记录进行组合
+   - SELF JOIN:表与自身连接
+   - NATURAL JOIN:当两个表具有相同名称的列时，会自动连接这些列
+
+- order by子句 order by age desc; #降序，asc升序
+- limit子句 limit 10; #查询前10条记录 或者top 10
+- group by子句 group by department; #按部门分组
+- having
+- union合并多个select语句的结果集
+
+4. 约束
+   用于规定表中数据必须满足的条件
+   约束可以在创建表时规定（通过 CREATE TABLE 语句），或者在表创建之后规定（通过 ALTER TABLE 语句）。
+   - NOT NULL：不允许字段为空
+   - UNIQUE：唯一，不允许重复
+   - PRIMARY KEY：主键，唯一且不为空  NOT NULL 和 UNIQUE 的结合
+   - FOREIGN KEY：外键，用于关联另一个表的主键
+   - CHECK：检查，保证列中的值符合指定的条件
+   - DEFAULT：默认值，用于设置字段的默认值
+	CREATE TABLE Orders (
+	OrderID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	OrderNumber INT NOT NULL,
+	CustomerID INT,
+	Price DECIMAL(10, 2) CHECK (Price >= 0)
+	JoinDate DATE DEFAULT GETDATE()
+	FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+	);
+
+5. 索引
+   用于提高查询效率，通过创建索引来加速查询操作
+
+sql函数
+1. 聚合函数:sum、avg、max、min、count、first、last
+2. 字符串函数:ucase、lcase、substring、len、round、now、format
+
 # Three.js
 # WebGL
